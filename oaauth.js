@@ -113,6 +113,7 @@ export default function (uriComponent) {
         {
             break
         }
+	sleep.sleep(10)
     }
     //redirect back to heroku oauth
 
@@ -124,8 +125,5 @@ export default function (uriComponent) {
     RateContentOK3.add(contentOK);
     GaugeContentSize3.add(res.body.length);
     AuthReqErrors3.add(!contentOK);
-
-
-
 
 };
