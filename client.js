@@ -7,6 +7,7 @@ const Express = require('express')
 const Config = require('./config')
 const App = Config.walletServiceUrl
 
+
 /**
  * Create a new HTTP client with `get` and `post` functions
  * @param {object?} [pair] User credential, or null to create a new key pair
@@ -20,7 +21,6 @@ module.exports = function(pair, appKey, appSecret) {
 
     return {
         pair,
-
         address: pair.address,
 
         get: (path, options) => {
