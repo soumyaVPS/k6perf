@@ -13,18 +13,22 @@ export let GaugeContentSize2 = new Gauge("ContentSize");
 export let AuthReqErrors2 = new Counter("wallet-oaut-callback-Req");
 
 
-export let TrendRTT3 = new Trend("RTT3"); //heroku app rtt
+export let TrendRTT3 = new Trend("RTT3");
 export let RateContentOK3 = new Rate("Content OK");
 export let GaugeContentSize3 = new Gauge("ContentSize");
 export let AuthReqErrors3 = new Counter("wallet-login-html");
 
-export let TrendRTT5 = new Trend("RTT-Waitlogin"); //heroku app rtt
-export let RateContentOK5 = new Rate("Content OK");
-export let GaugeContentSize5 = new Gauge("ContentSize");
+export let TrendRTT5 = new Trend("RTT-Waitlogin");
+export let RateContentOK5 = new Rate("Content OK Waitlogin");
+export let GaugeContentSize5 = new Gauge("ContentSize Waitlogin");
 export let AuthReqErrors5 = new Counter("waitlogin-loop");
 
+let username = __ENV.userid;
+
+//console.log(username)
+
 export let options = {
-    thresholds: {
+    /*thresholds: {
         "RTT": [
             "p(99)<300",
             "p(70)<250",
@@ -35,8 +39,10 @@ export let options = {
         "Content OK": ["rate>0.95"],
         "ContentSize": ["value<4000"],
         "Errors": ["count<100"]
-    }
-};
+    }*/
+        vus: 1,
+        duration: "1m"
+   };
 ``
 function queryMap(urlstr) {
     return urlstr.search
@@ -51,6 +57,7 @@ function queryMap(urlstr) {
 }
 
 export default function (uriComponent) {
+    console.log(username)
     let res = http.get(config.relyingparty+"?login_hint="+config.login_hint, {redirects:0}) ;
    // console.log(JSON.stringify(res.headers))
     let contentOK = res.status==302
@@ -78,7 +85,7 @@ export default function (uriComponent) {
         {headers: {"referer":config.relyingparty},
             redirects: 0})
     //const {login_hint} = queryMap(urlpath)
-    const usernameParam = encodeURIComponent(config.username)
+    const usernameParam = encodeURIComponent(username)
     let loc = res2.headers["Location"]
 
     const queryParam = encodeURIComponent(loc.substring(loc.indexOf('?')+1))
@@ -113,17 +120,17 @@ export default function (uriComponent) {
         {
             break
         }
-	sleep.sleep(10)
+
     }
     //redirect back to heroku oauth
 
-   // console.log(JSON.stringify(res3.body))
 
-
+/*
     contentOK = res3.status==200
     TrendRTT3.add(res3.timings.duration);
     RateContentOK3.add(contentOK);
     GaugeContentSize3.add(res.body.length);
     AuthReqErrors3.add(!contentOK);
+    */
 
 };

@@ -89,16 +89,12 @@ function  register() {
 
     var getPendingRequest = () =>{
 
-        console.log("in getPendingRequest")
+       // console.log("in getPendingRequest")
         httpGet('/getPendingRequest',undefined, TK_APP_KEY, TK_APP_SECRET).expect(200)
             .then( r=>{
-                console.log(r.body)
+               // console.log(r.body)
 
-                if (r.body.data.result == false ) {
-                    setTimeout(getPendingRequest, 5000)
-                }
-                else
-                {
+                if (r.body.data.result != false ) {
                     sigReq = r.body.data
                     deviceRespond(sigReq,{accept_login: true, abort_poll: true, credential: httpClient.pair},sigReq.nonce)
                         .then(r=>{
@@ -106,16 +102,18 @@ function  register() {
                         })
                 }
 
+               // setTimeout(getPendingRequest, 50)
+                getPendingRequest()
             })
 
     }
     var registerLogin = () => {
-        console.log("in registerlogin")
+        //console.log("in registerlogin")
         httpGet('/registerLogin?login=' + encodeURIComponent(login), undefined, TK_APP_KEY, TK_APP_SECRET)
             .then(r => {
                 console.log(r.body)
                 Assert.deepStrictEqual(r.body, { data: true })
-                setTimeout(getPendingRequest, 5000)
+                setTimeout(getPendingRequest, 50)
             })
             .catch(err => {
                 console.log("caught error", err.message)
