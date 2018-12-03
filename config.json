@@ -1,10 +1,10 @@
-{
+/*{
   "hosts": {
     "test.loadimpact.com": "1.2.3.4"
   },
   "stages": [
-    { "duration": "1m", "target": 10 },
-    { "duration": "1m", "target": 30 },
+    { "duration": "1m", "target": 1 },
+    { "duration": "1m", "target": 3 },
     { "duration": "1m", "target": 0 }
   ],
   "thresholds": {
@@ -12,4 +12,4 @@
   },
   "noConnectionReuse": true,
   "userAgent": "MyK6UserAgentString/1.0"
-}
+}*/
