@@ -2,7 +2,8 @@ module.exports=
 { "relyingparty": "https://soumya-rp-ip-stg-example.herokuapp.com/login",
     "login_hint":"soumya.aithal@trustedkey.com",
     "walletServiceUrl": "https://wallet-stg.trustedkey.com",
-    "submitloginuri": `/oauth/IDentify/submitLogin?query=queryParam&username=usernameParam`,
+    //"submitloginuri": `/oauth/IDentify/submitLogin?query=queryParam&username=usernameParam`,
+    "submitloginuri": "/oauth/IDentify/submitLogin",
     "waitloginuri": `/oauth/IDentify/waitLogin?nonce=nonceParam`,
 
   "callbackRoute": "/oauth/callback",
@@ -13,5 +14,5 @@ module.exports=
   "port": 80,
   "expiryYears": 10,
 
-  "username":"soumya.aithal@trustedkey.com"
+  //"username":"soumya.aithal@trustedkey.com"
 }

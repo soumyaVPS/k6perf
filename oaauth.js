@@ -1,6 +1,10 @@
+//Cmd to execute: k6 run  -e userid=test-login0.8211764547939031@example.com oaauth.js
+
 import { check } from "k6";
 import http from "k6/http";
 import { Trend, Rate, Counter, Gauge } from "k6/metrics";
+
+
 const config = require('./config.js');
 export let TrendRTT1 = new Trend("RTT1"); //heroku app rtt
 export let RateContentOK1 = new Rate("Content OK");
@@ -23,7 +27,7 @@ export let RateContentOK5 = new Rate("Content OK Waitlogin");
 export let GaugeContentSize5 = new Gauge("ContentSize Waitlogin");
 export let AuthReqErrors5 = new Counter("waitlogin-loop");
 
-let username = __ENV.userid;
+let env_username = __ENV.userid;
 
 //console.log(username)
 
@@ -40,37 +44,42 @@ export let options = {
         "ContentSize": ["value<4000"],
         "Errors": ["count<100"]
     }*/
-        vus: 1,
-        duration: "1m"
+       // vus: 1,
+        //duration: "1m"
    };
 ``
-function queryMap(urlstr) {
-    return urlstr.search
-        .substring(1)
-        .split('&')
-        .reduce((acc, kv) => {
-            const [k, v] = kv.split('=')
-            /* eslint-disable-next-line security/detect-object-injection */
-            acc[k] = v
-            return acc
-        }, {})
+
+function parseParam(query, qp)
+{
+    var vars = query.split('&');
+    for (var i = 0; i < vars.length; i++) {
+        var pair = vars[i].split('=');
+        if (pair[0] == qp)
+            return pair[1]
+    }
+    return undefined
 }
 
 export default function (uriComponent) {
-    console.log(username)
-    let res = http.get(config.relyingparty+"?login_hint="+config.login_hint, {redirects:0}) ;
-   // console.log(JSON.stringify(res.headers))
+    console.log(env_username)
+    let res = http.get(config.relyingparty+"?login_hint="+env_username, {redirects:0}) ;
+    console.log("Relying party  login request\'s response headers: ", JSON.stringify(res.headers))
+    console.log("response body: ",JSON.stringify(res.body))
+
     let contentOK = res.status==302
     TrendRTT1.add(res.timings.duration);
     RateContentOK1.add(contentOK);
     GaugeContentSize1.add(res.body.length);
     AuthReqErrors1.add(!contentOK);
-
+``
     //redirect to trustedkey wallet oauth/authorize
 
     let res2 = http.get(res.headers["Location"],
         {headers: {"referer":config.relyingparty},
          redirects: 0})
+
+    console.log("wallet  oauth/authorize request\'s response headers: ", JSON.stringify(res2.headers))
+    console.log("response body: ",res2.body)
 
     contentOK = res2.status==302
     TrendRTT2.add(res2.timings.duration);
@@ -79,31 +88,37 @@ export default function (uriComponent) {
     AuthReqErrors2.add(!contentOK);
 
     //redirect to login.html
-    let urlpath = config.walletServiceUrl + res2.headers["Location"]
-    //console.log(urlpath)
-    let res3 = http.get(urlpath,
-        {headers: {"referer":config.relyingparty},
-            redirects: 0})
-    //const {login_hint} = queryMap(urlpath)
-    const usernameParam = encodeURIComponent(username)
-    let loc = res2.headers["Location"]
 
-    const queryParam = encodeURIComponent(loc.substring(loc.indexOf('?')+1))
+    let urlpath = config.walletServiceUrl + res2.headers["Location"]
+    console.log("login.html redirect path" ,urlpath)
+    let res3 = http.get(urlpath,
+        {headers: {"referer":config.relyingparty}, redirects: 0})
+
+    //const usernameParam = encodeURIComponent(env_username)
+    let loc = res2.headers["Location"]
+    let queryParam = loc.substring(loc.indexOf('?')).substring(1)
+
+    console.log("*********************************** \n")
+    console.log(queryParam)
+    let usernameParam = parseParam(queryParam, "login_hint")
+    let nonceParam = parseParam(queryParam,"nonce")
+    console.log(usernameParam, nonceParam)
+    console.log("*********************************** \n")
 
 
     //submitlogin
-    urlpath = config.walletServiceUrl + config.submitloginuri.replace('usernameParam',usernameParam).replace('queryParam',queryParam)
-    //console.log("submit urlPath :", urlpath)
+    urlpath = config.walletServiceUrl + config.submitloginuri + "?"+"nonce="+nonceParam +"&username="+usernameParam
+
+    console.log("submit urlPath :", urlpath)
 
     let res4 = http.get(urlpath, {cache: 'no-cache'})
-    //console.log(res4.body)
-    let jsonResp = JSON.parse(res4.body)
+    let jsonResp =res4.body
 
-    console.log(jsonResp.data.nonce)
+    console.log(jsonResp)
 
     //waitlogin
 
-    urlpath = config.walletServiceUrl + config.waitloginuri.replace('nonceParam',jsonResp.data.nonce)
+    urlpath = config.walletServiceUrl + config.waitloginuri.replace('nonceParam',nonceParam)
     console.log("wait urlPath :", urlpath)
 
     let res5 = http.get(urlpath, {cache: 'no-cache'})
