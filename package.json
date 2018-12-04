@@ -10,6 +10,27 @@
     "k6": "0.0.0",
     "querystring": "^0.2.0",
     "supertest": "^3.0.0",
-    "trustedkey-js": "0.3.23"
-  }
+    "trustedkey-js": "0.3.23",
+    "debug": "^4.1.0",
+    "yargs": "^9.0.1"
+  },
+  "main": "createdevices",
+  "directories": {
+    "lib": "lib"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "node createdevices"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/soumyaVPS/k6perf.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/soumyaVPS/k6perf/issues"
+  },
+  "homepage": "https://github.com/soumyaVPS/k6perf#readme",
+  "description": ""
 }
