@@ -81,7 +81,7 @@ function deviceRespond(signatureRequest, options, nonce, checksum) {
             options.username_response,
             options.accept_login ? certs : null,
             options.chain
-        )//.replace(/https?:\/\/[^/?]+/, walletUrl)
+        )
 
         return httpClient.get(URL.parse(url).path, options)
     } else {
@@ -92,44 +92,44 @@ function deviceRespond(signatureRequest, options, nonce, checksum) {
 function  register() {
 
     var getPendingRequest = () =>{
-
-       // console.log("in getPendingRequest")
+        console.log("getpendingRequest :" , Date.now())
         httpGet('/getPendingRequest',undefined, TK_APP_KEY, TK_APP_SECRET).expect(200)
             .then( r=>{
                // console.log(r.body)
-
+                console.log("getpendingRequest 2:" , Date.now())
                 if (r.body.data.result != false ) {
                     sigReq = r.body.data
-                    console.log("Got a pending request at :",Date.now())
+                    //console.log("Got a pending request at :",Date.now())
                     deviceRespond(sigReq,{accept_login: true, abort_poll: true, credential: httpClient.pair},sigReq.nonce)
                         .then(r=>{
-                            console.log(r.body)
+                            //console.log(r.body)
+                            console.log("Device responded at :" , Date.now())
                         })
-                    console.log("Device responded at :" , Date.now())
+
                 }
 
-                setTimeout(getPendingRequest, 50)
+                setTimeout(getPendingRequest, 500)
                 //getPendingRequest()
             })
     }
 
     var registerLogin = () => {
-        //console.log("in registerlogin")
         httpGet('/registerLogin?login=' + encodeURIComponent(login), undefined, TK_APP_KEY, TK_APP_SECRET)
             .then(r => {
+                console.log("registerLogin at :",Date.now())
                 console.log(r.body)
                 Assert.deepStrictEqual(r.body, { data: true })
-                setTimeout(getPendingRequest, 50)
+                setTimeout(getPendingRequest, 200)
             })
             .catch(err => {
                 console.log("caught error", err.message)
             })
-
-
     }
 
+    console.log("registerDevice at :",Date.now())
     httpGet('/registerDevice?devicetoken=' + devicetoken, undefined, TK_APP_KEY, TK_APP_SECRET)
         .then(r => {
+            console.log("registerDevice at :",Date.now())
             console.log(r.body);
             Assert.deepStrictEqual(r.body, {data: {registerDevice: true}})
             registerLogin();
@@ -137,7 +137,7 @@ function  register() {
         })
 
 }
+//loadusers()
 
 dumpcreds()
 register()
-

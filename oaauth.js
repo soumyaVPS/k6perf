@@ -31,14 +31,14 @@ export let AuthReqErrorsTK4 = new Counter("tk-submit-login errors");
 
 export let TrendRTTTK5 = new Trend("tk-wait-login RTT");
 export let RateContentOKTK5 = new Rate("tk-wait-login Content OK ");
-export let GaugeContentSizeTK5 = new Gauge("tk-wait-login ContentSize Waitlogin");
-export let AuthReqErrorsTK5 = new Counter("tk-wait-login waitlogin-loop");
+export let GaugeContentSizeTK5 = new Gauge("tk-wait-login ContentSize");
+export let AuthReqErrorsTK5 = new Counter("tk-wait-login errors");
 
 let env_login_prefix = __ENV.login_prefix;
 ////console.log(env_login_prefix)
-/*
+
 export let options = {
-    thresholds: {
+    /*thresholds: {
         "RTT": [
             "p(99)<300",
             "p(70)<250",
@@ -51,9 +51,10 @@ export let options = {
         "Errors": ["count<100"]
     }
         vus: 1,
-        duration: "1m"
+    duration: "1m"
+    */
    };
-*/
+
 
 function parseParam(query, qp)
 {
@@ -71,12 +72,15 @@ export default function (uriComponent) {
     var vu_id=`${__VU}` - 1
 
     //console.log("****************************"+ env_login_prefix)
-    var username = env_login_prefix+vu_id+"@example.com"
-    console.log("***************************"+username);
-    let res = http.get(config.relyingparty+"?login_hint="+username, {redirects:0}) ;
+    //var username = env_login_prefix+vu_id+"@example.com"
+    var username = env_login_prefix
+    //console.log("***************************"+username);
+    let urlpath =config.relyingparty+"?login_hint="+username
+    //console.log(urlpath)
+    let res = http.get(urlpath, {redirects:0}) ;
     //console.log("Relying party  login request\'s response headers: ", JSON.stringify(res.headers))
-    ////console.log("response body: ",JSON.stringify(res.body))
-
+    //console.log("response body: ",JSON.stringify(res.body))
+//console.log("****************************************************************")
     let contentOK = res.status==302
     TrendRTTRP1.add(res.timings.duration);
     RateContentOKRPP1.add(contentOK);
@@ -85,13 +89,15 @@ export default function (uriComponent) {
 
     //redirects to trustedkey wallet oauth/authorize
 
-    let res2 = http.get(res.headers["Location"],
+    urlpath = res.headers["Location"]
+    //console.log(urlpath)
+    let res2 = http.get(urlpath,
         {headers: {"referer":config.relyingparty},
          redirects: 0})
 
     //console.log("wallet  oauth/authorize request\'s response headers: ", JSON.stringify(res2.headers))
-    ////console.log("response body: ",res2.body)
-
+    //console.log("response body: ",res2.body)
+//console.log("****************************************************************")
     contentOK = res2.status==302
     TrendRTTTK2.add(res2.timings.duration);
     RateContentOKTK2.add(contentOK);
@@ -100,11 +106,12 @@ export default function (uriComponent) {
 
 
     //oauth redirects to login.html. Shows image and downloads scripts. the scripts invoke submitlogin and waitlogin
-    let urlpath = config.walletServiceUrl + res2.headers["Location"]
-    //console.log("login.html redirect path" ,urlpath)
+    urlpath = config.walletServiceUrl + res2.headers["Location"]
+    //console.log(urlpath)
     let res3 = http.get(urlpath,
         {headers: {"referer":config.relyingparty}, redirects: 0}) //TODO:: referer  is not right
-    ////console.log("login.html response:", res3.headers, res3.status, res3.body)
+    //console.log("login.html response:", res3.headers, res3.status, res3.body)
+//console.log("****************************************************************")
 
 
     contentOK = res3.status==200
@@ -121,18 +128,16 @@ export default function (uriComponent) {
     ////console.log(queryParam)
     let usernameParam = parseParam(queryParam, "login_hint")
     let nonceParam = parseParam(queryParam,"nonce")
-    ////console.log(usernameParam, nonceParam)
-    ////console.log("*********************************** \n")
+    //console.log(usernameParam, nonceParam)
 
 
 
     urlpath = config.walletServiceUrl + config.submitloginuri + "?"+"nonce="+nonceParam +"&username="+usernameParam
-
-    ////console.log("submit urlPath :", urlpath)
-    //console.log("submitlogin initiated @",Date.now(), "url : ", urlpath)
+    //console.log(urlpath)
 
     let res4 = http.get(urlpath, {cache: 'no-cache'})
     //console.log("submitlogin response:", res4.headers, res4.status, res4.body)
+//console.log("*********************************** \n")
 
     contentOK = res4.status == 200
     TrendRTTTK4.add(res4.timings.duration);
@@ -141,31 +146,34 @@ export default function (uriComponent) {
     AuthReqErrorsTK4.add(!contentOK);
 
     let jsonResp =res4.body
-    //console.log(jsonResp)
+    //console.log(res4.headers, "\n", jsonResp)
+//console.log("*********************************** \n")
 
     //waitlogin
+    contentOK = false
+    while (!contentOK) {
 
-    urlpath = config.walletServiceUrl + config.waitloginuri.replace('nonceParam',nonceParam)
-    //console.log("waitlogin initiated @",Date.now(), "url : ", urlpath)
+        urlpath = config.walletServiceUrl + config.waitloginuri.replace('nonceParam', nonceParam)
+        console.log("XXXXXXX", urlpath)
 
-    let res5 = http.get(urlpath, {cache: 'no-cache'})
-    let contentOK5 = false
-    while (!contentOK5) {
+        let res5 = http.get(urlpath, {cache: 'no-cache'})
+
+        //console.log(res5.status, res5.headers, "\n", res5.body)
+        //console.log("*********************************** \n")
+
+        contentOK = res5.status == 200
+
         //console.log(res5.status, res5.body, res5.headers)
-        contentOK5 = !(res5.status == 408 || res5.status == 499)
-
         TrendRTTTK5.add(res5.timings.duration);
-        RateContentOKTK5.add(contentOK5);
+        RateContentOKTK5.add(contentOK);
         GaugeContentSizeTK5.add(res5.body.length);
-        AuthReqErrorsTK5.add(!contentOK5);
-        if (contentOK5 && res5.status != 200)
-        {
-            break
-        }
+        AuthReqErrorsTK5.add(!contentOK);
 
+
+        //redirect back to heroku oauth
+        //let json = res5.body
+        //console.log(json)
     }
-    //redirect back to heroku oauth
-
 
 
 };

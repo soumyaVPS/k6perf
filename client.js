@@ -43,9 +43,10 @@ module.exports = function(pair, appKey, appSecret) {
                 .post(path)
                 .set('Accept', json ? 'application/json' : 'text/plain')
                 .set('Content-Type', 'application/json')
-
+            let authzheader = WalletUtils.getAuthorizationHeader(req.url, credential, body, key, secret)
+          //  console.log("Before Post ", Date.now())
             return req
-                .set('Authorization', WalletUtils.getAuthorizationHeader(req.url, credential, body, key, secret))
+                .set('Authorization', authzheader)
                 .send(body)
         }
     }
