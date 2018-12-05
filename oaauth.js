@@ -31,14 +31,14 @@ export let AuthReqErrorsTK4 = new Counter("tk-submit-login errors");
 
 export let TrendRTTTK5 = new Trend("tk-wait-login RTT");
 export let RateContentOKTK5 = new Rate("tk-wait-login Content OK ");
-export let GaugeContentSizeTK5 = new Gauge("tk-wait-login ContentSize Waitlogin");
-export let AuthReqErrorsTK5 = new Counter("tk-wait-login waitlogin-loop");
+export let GaugeContentSizeTK5 = new Gauge("tk-wait-login ContentSize");
+export let AuthReqErrorsTK5 = new Counter("tk-wait-login errors");
 
 let env_login_prefix = __ENV.login_prefix;
 ////console.log(env_login_prefix)
-/*
+
 export let options = {
-    thresholds: {
+    /*thresholds: {
         "RTT": [
             "p(99)<300",
             "p(70)<250",
@@ -51,9 +51,10 @@ export let options = {
         "Errors": ["count<100"]
     }
         vus: 1,
-        duration: "1m"
+    duration: "1m"
+    */
    };
-*/
+
 
 function parseParam(query, qp)
 {
@@ -72,7 +73,7 @@ export default function (uriComponent) {
 
     //console.log("****************************"+ env_login_prefix)
     var username = env_login_prefix+vu_id+"@example.com"
-    console.log("***************************"+username);
+    //console.log("***************************"+username);
     let res = http.get(config.relyingparty+"?login_hint="+username, {redirects:0}) ;
     //console.log("Relying party  login request\'s response headers: ", JSON.stringify(res.headers))
     ////console.log("response body: ",JSON.stringify(res.body))
@@ -121,8 +122,8 @@ export default function (uriComponent) {
     ////console.log(queryParam)
     let usernameParam = parseParam(queryParam, "login_hint")
     let nonceParam = parseParam(queryParam,"nonce")
-    ////console.log(usernameParam, nonceParam)
-    ////console.log("*********************************** \n")
+    //console.log(usernameParam, nonceParam)
+    //console.log("*********************************** \n")
 
 
 
