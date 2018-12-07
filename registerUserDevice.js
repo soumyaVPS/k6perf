@@ -102,18 +102,17 @@ function  register() {
                     //console.log("Got a pending request at :",Date.now())
                     deviceRespond(sigReq,{accept_login: true, abort_poll: true, credential: httpClient.pair},sigReq.nonce)
                         .then(r=>{
-                            //console.log(r.body)
-                            console.log("Device responded at :" , Date.now())
-                        })
-
+                              //console.log("Device responded at :" , Date.now())
+                              })
                 }
 
-                setTimeout(getPendingRequest, 500)
-                //getPendingRequest()
+                //setTimeout(getPendingRequest, 100)
+                getPendingRequest()
             })
     }
 
     var registerLogin = () => {
+
         httpGet('/registerLogin?login=' + encodeURIComponent(login), undefined, TK_APP_KEY, TK_APP_SECRET)
             .then(r => {
                 console.log("registerLogin at :",Date.now())

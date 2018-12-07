@@ -72,15 +72,14 @@ export default function (uriComponent) {
     var vu_id=`${__VU}` - 1
 
     //console.log("****************************"+ env_login_prefix)
-    //var username = env_login_prefix+vu_id+"@example.com"
-    var username = env_login_prefix
+    var username = env_login_prefix+vu_id+"@example.com"
+    //var username = env_login_prefix
     //console.log("***************************"+username);
     let urlpath =config.relyingparty+"?login_hint="+username
     //console.log(urlpath)
     let res = http.get(urlpath, {redirects:0}) ;
     //console.log("Relying party  login request\'s response headers: ", JSON.stringify(res.headers))
     //console.log("response body: ",JSON.stringify(res.body))
-//console.log("****************************************************************")
     let contentOK = res.status==302
     TrendRTTRP1.add(res.timings.duration);
     RateContentOKRPP1.add(contentOK);
@@ -97,7 +96,6 @@ export default function (uriComponent) {
 
     //console.log("wallet  oauth/authorize request\'s response headers: ", JSON.stringify(res2.headers))
     //console.log("response body: ",res2.body)
-//console.log("****************************************************************")
     contentOK = res2.status==302
     TrendRTTTK2.add(res2.timings.duration);
     RateContentOKTK2.add(contentOK);
@@ -111,7 +109,6 @@ export default function (uriComponent) {
     let res3 = http.get(urlpath,
         {headers: {"referer":config.relyingparty}, redirects: 0}) //TODO:: referer  is not right
     //console.log("login.html response:", res3.headers, res3.status, res3.body)
-//console.log("****************************************************************")
 
 
     contentOK = res3.status==200
@@ -124,7 +121,6 @@ export default function (uriComponent) {
     let loc = res2.headers["Location"]
     let queryParam = loc.substring(loc.indexOf('?')).substring(1)
 
-    ////console.log("*********************************** \n")
     ////console.log(queryParam)
     let usernameParam = parseParam(queryParam, "login_hint")
     let nonceParam = parseParam(queryParam,"nonce")
@@ -137,7 +133,6 @@ export default function (uriComponent) {
 
     let res4 = http.get(urlpath, {cache: 'no-cache'})
     //console.log("submitlogin response:", res4.headers, res4.status, res4.body)
-//console.log("*********************************** \n")
 
     contentOK = res4.status == 200
     TrendRTTTK4.add(res4.timings.duration);
@@ -147,7 +142,6 @@ export default function (uriComponent) {
 
     let jsonResp =res4.body
     //console.log(res4.headers, "\n", jsonResp)
-//console.log("*********************************** \n")
 
     //waitlogin
     contentOK = false
@@ -159,7 +153,6 @@ export default function (uriComponent) {
         let res5 = http.get(urlpath, {cache: 'no-cache'})
 
         //console.log(res5.status, res5.headers, "\n", res5.body)
-        //console.log("*********************************** \n")
 
         contentOK = res5.status == 200
 
