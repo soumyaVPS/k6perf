@@ -1,6 +1,6 @@
 install k6
 
-Create device using:
+Create devices using:
 $node createdevices -n 5 -login_prefix xxyyy3
 
 Alternatively run registerdevice for a single device
