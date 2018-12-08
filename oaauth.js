@@ -69,12 +69,12 @@ function parseParam(query, qp)
 
 export default function (uriComponent) {
 
-    var vu_id=`${__VU}` - 1
+    var vu_id=`${__VU}`
 
     //console.log("****************************"+ env_login_prefix)
-    var username = env_login_prefix+vu_id+"@example.com"
+    var username = env_login_prefix+vu_id
     //var username = env_login_prefix
-    //console.log("***************************"+username);
+    console.log("***************************"+username);
     let urlpath =config.relyingparty+"?login_hint="+username
     //console.log(urlpath)
     let res = http.get(urlpath, {redirects:0}) ;

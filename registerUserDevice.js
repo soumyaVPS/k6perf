@@ -92,11 +92,11 @@ function deviceRespond(signatureRequest, options, nonce, checksum) {
 function  register() {
 
     var getPendingRequest = () =>{
-        console.log("getpendingRequest :" , Date.now())
+        //console.log("getpendingRequest :" , Date.now())
         httpGet('/getPendingRequest',undefined, TK_APP_KEY, TK_APP_SECRET).expect(200)
             .then( r=>{
                // console.log(r.body)
-                console.log("getpendingRequest 2:" , Date.now())
+                //console.log("getpendingRequest 2:" , Date.now())
                 if (r.body.data.result != false ) {
                     sigReq = r.body.data
                     //console.log("Got a pending request at :",Date.now())
@@ -106,8 +106,8 @@ function  register() {
                               })
                 }
 
-                //setTimeout(getPendingRequest, 100)
-                getPendingRequest()
+                setTimeout(getPendingRequest, 500)
+                //getPendingRequest()
             })
     }
 
