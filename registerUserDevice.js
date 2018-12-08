@@ -8,7 +8,7 @@ const Assert = Chai.assert
 const devicetoken =
     'elYWjUdm1O4:APA91bGveIgqwCegLGp1RTdrUYPB1e7BEMHauKi84nLSDw9ie94ckxDOx9cp9mH4ITue-BxE3SFs28hoQGA7i9ynK6DL70e09k9Qe6bLd1icC5FfDN4RHfJy2YYAgbRavQRtZM-' + (Math.random() * 0xFFFFFF).toString(16).substring(2, 6)
 //const login = `test-login${Math.random()}@example.com`
-const login = args.login
+const login_name = args.login
 const  TK_APP_KEY = "7472b6380925e165b32acb0871e8f5e5";
 const TK_APP_SECRET = "c8248a05f6c7494391109ac309a5b74d";
 const httpClient = require('./client')(undefined, TK_APP_KEY, TK_APP_SECRET)
@@ -22,7 +22,7 @@ const WalletUtils = require('./lib/WalletUtils')
 
 function dumpcreds()
 {
-    console.log("login: ", login)
+    console.log("login: ", login_name)
     console.log("devicetoken: ",devicetoken)
     console.log("address",  httpClient.address)
     //console.log("credentials: ", httpClient.pair)
@@ -62,7 +62,7 @@ function deviceRespond(signatureRequest, options, nonce, checksum) {
             options.accept_login
         )//.replace(/https?:\/\/[^/?]+/, walletUrl)
 
-        //console.log(url.path)
+
         const body = {certs, chain: options.chain}
         return httpClient.post(URL.parse(url).path, body, {TK_APP_KEY, TK_APP_SECRET})
     }
@@ -88,22 +88,38 @@ function deviceRespond(signatureRequest, options, nonce, checksum) {
         Assert.fail('Unsupported callbackType: ' + signatureRequest.callbackType)
     }
 }
-
+var reqCount = 0
+var timeSum = 0
+var allPendingTimeSum = 0
+var allPendingCount = 0
 function  register() {
 
     var getPendingRequest = () =>{
-        console.log("getpendingRequest :" , Date.now())
+        //console.log("getpendingRequest :" , Date.now())
+        let timestart = Date.now()
         httpGet('/getPendingRequest',undefined, TK_APP_KEY, TK_APP_SECRET).expect(200)
             .then( r=>{
-               // console.log(r.body)
-                console.log("getpendingRequest 2:" , Date.now())
+                allPendingTimeSum += Date.now() - timestart
+                allPendingCount++
+                if (allPendingCount==100){
+                    console.log(login_name,": Average time over ", allPendingCount, " getPendingRequest calls:", allPendingTimeSum/allPendingCount )
+                    allPendingCount = 0
+                    allPendingTimeSum = 0
+                }
                 if (r.body.data.result != false ) {
                     sigReq = r.body.data
-                    //console.log("Got a pending request at :",Date.now())
+                    //console.log(timestart ," Got a pending request at :",Date.now())
                     deviceRespond(sigReq,{accept_login: true, abort_poll: true, credential: httpClient.pair},sigReq.nonce)
                         .then(r=>{
-                              //console.log("Device responded at :" , Date.now())
-                              })
+                            //console.log("Device responded at :" , Date.now())
+                            timeSum += Date.now() - timestart
+                            reqCount++
+                            if (reqCount==30){
+                                console.log(login_name,": Average time over ", reqCount, " completeLogin calls:", timeSum/reqCount )
+                                reqCount = 0
+                                timeSum = 0
+                            }
+                        })
                 }
 
                 //setTimeout(getPendingRequest, 100)
@@ -113,7 +129,7 @@ function  register() {
 
     var registerLogin = () => {
 
-        httpGet('/registerLogin?login=' + encodeURIComponent(login), undefined, TK_APP_KEY, TK_APP_SECRET)
+        httpGet('/registerLogin?login=' + encodeURIComponent(login_name), undefined, TK_APP_KEY, TK_APP_SECRET)
             .then(r => {
                 console.log("registerLogin at :",Date.now())
                 console.log(r.body)
