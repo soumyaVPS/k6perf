@@ -6,7 +6,7 @@ const args = require('yargs').argv;
 
 const Assert = Chai.assert
 const devicetoken =
-    'elYWjUdm1O4:APA91bGveIgqwCegLGp1RTdrUYPB1e7BEMHauKi84nLSDw9ie94ckxDOx9cp9mH4ITue-BxE3SFs28hoQGA7i9ynK6DL70e09k9Qe6bLd1icC5FfDN4RHfJy2YYAgbRavQRtZM-' + (Math.random() * 0xFFFFFF).toString(16).substring(2, 6)
+'elYWjUdm1O4:APA91bGveIgqwCegLGp1RTdrUYPB1e7BEMHauKi84nLSDw9ie94ckxDOx9cp9mH4ITue-BxE3SFs28hoQGA7i9ynK6DL70e09k9Qe6bLd1icC5FfDN4RHfJy2YYAgbRavQRtZM-' + (Math.random() * 0xFFFFFF).toString(16).substring(2, 6)
 //const login = `test-login${Math.random()}@example.com`
 const login_name = args.login
 const  TK_APP_KEY = "7472b6380925e165b32acb0871e8f5e5";
@@ -26,63 +26,63 @@ function dumpcreds()
     console.log("devicetoken: ",devicetoken)
     console.log("address",  httpClient.address)
     //console.log("credentials: ", httpClient.pair)
-
+    
 }
 function deviceRespond(signatureRequest, options, nonce, checksum) {
     //const objectIds = signatureRequest.objectIds
-   // Assert.deepStrictEqual(signatureRequest.claims, options.claims)
+    // Assert.deepStrictEqual(signatureRequest.claims, options.claims)
     delete signatureRequest.claims
     delete signatureRequest.objectIds
     delete signatureRequest.universalLink
-
+    
     /*Assert.deepEqual(signatureRequest, {
-        callbackType: 'post',
-        callbackUrl: ExpectedCallbackUrl,
-        nonce: nonce,
-        username: options.username,
-        message: options.message || `Please authenticate ${checksum}`,
-        hostname: '127.0.0.1',
-        client_id: clientId,
-        scope: options.scope
-    })
-    */
-
+     callbackType: 'post',
+     callbackUrl: ExpectedCallbackUrl,
+     nonce: nonce,
+     username: options.username,
+     message: options.message || `Please authenticate ${checksum}`,
+     hostname: '127.0.0.1',
+     client_id: clientId,
+     scope: options.scope
+     })
+     */
+    
     // Assemble callback URL for device
     var certs = []
-
+    
     if (signatureRequest.callbackType === 'post') {
         let url = WalletUtils.buildClaimCallback(
-            options.credential || pair,
-            signatureRequest.callbackUrl,
-           // clientId,
-            Config.clientId,
-            signatureRequest.nonce,
-            //signatureRequest.username,
-            undefined,
-            options.accept_login
-        )//.replace(/https?:\/\/[^/?]+/, walletUrl)
-
-
+                                                 options.credential || pair,
+                                                 signatureRequest.callbackUrl,
+                                                 // clientId,
+                                                 Config.clientId,
+                                                 signatureRequest.nonce,
+                                                 //signatureRequest.username,
+                                                 undefined,
+                                                 options.accept_login
+                                                 )//.replace(/https?:\/\/[^/?]+/, walletUrl)
+        
+        
         const body = {certs, chain: options.chain}
         return httpClient.post(URL.parse(url).path, body, {TK_APP_KEY, TK_APP_SECRET})
     }
     else if (objectIds && options.include_certificate) {
         certs = WalletUtils.matchClaims(Globals.pems, objectIds.split(',')).map(
-            claim => (options.noPemHeader ? claim.pem.replace(/-----[ A-Z]+-----|\r?\n/g, '') : claim.pem)
-        )
+                                                                                claim => (options.noPemHeader ? claim.pem.replace(/-----[ A-Z]+-----|\r?\n/g, '') : claim.pem)
+                                                                                )
     }
-
+    
     if (signatureRequest.callbackType === 'json') {
         let url = WalletUtils.buildClaimCallback(
-            options.credential || pair,
-            signatureRequest.callbackUrl,
-            Config.clientId,
-            signatureRequest.nonce,
-            options.username_response,
-            options.accept_login ? certs : null,
-            options.chain
-        )
-
+                                                 options.credential || pair,
+                                                 signatureRequest.callbackUrl,
+                                                 Config.clientId,
+                                                 signatureRequest.nonce,
+                                                 options.username_response,
+                                                 options.accept_login ? certs : null,
+                                                 options.chain
+                                                 )
+        
         return httpClient.get(URL.parse(url).path, options)
     } else {
         Assert.fail('Unsupported callbackType: ' + signatureRequest.callbackType)
@@ -93,64 +93,64 @@ var timeSum = 0
 var allPendingTimeSum = 0
 var allPendingCount = 0
 function  register() {
-
+    
     var getPendingRequest = () =>{
         //console.log("getpendingRequest :" , Date.now())
         let timestart = Date.now()
         httpGet('/getPendingRequest',undefined, TK_APP_KEY, TK_APP_SECRET).expect(200)
-            .then( r=>{
-                allPendingTimeSum += Date.now() - timestart
-                allPendingCount++
-                if (allPendingCount==100){
-                    console.log(login_name,": Average time over ", allPendingCount, " getPendingRequest calls:", allPendingTimeSum/allPendingCount )
-                    allPendingCount = 0
-                    allPendingTimeSum = 0
-                }
-                if (r.body.data.result != false ) {
-                    sigReq = r.body.data
-                    //console.log(timestart ," Got a pending request at :",Date.now())
-                    deviceRespond(sigReq,{accept_login: true, abort_poll: true, credential: httpClient.pair},sigReq.nonce)
-                        .then(r=>{
-                            //console.log("Device responded at :" , Date.now())
-                            timeSum += Date.now() - timestart
-                            reqCount++
-                            if (reqCount==30){
-                                console.log(login_name,": Average time over ", reqCount, " completeLogin calls:", timeSum/reqCount )
-                                reqCount = 0
-                                timeSum = 0
-                            }
-                        })
-                }
-
-                //setTimeout(getPendingRequest, 100)
-                getPendingRequest()
-            })
+        .then( r=>{
+              allPendingTimeSum += Date.now() - timestart
+              allPendingCount++
+              if (allPendingCount==100){
+              console.log(login_name,": Average time over ", allPendingCount, " getPendingRequest calls:", allPendingTimeSum/allPendingCount )
+              allPendingCount = 0
+              allPendingTimeSum = 0
+              }
+              if (r.body.data.result != false ) {
+              sigReq = r.body.data
+              //console.log(timestart ," Got a pending request at :",Date.now())
+              deviceRespond(sigReq,{accept_login: true, abort_poll: true, credential: httpClient.pair},sigReq.nonce)
+              .then(r=>{
+                    //console.log("Device responded at :" , Date.now())
+                    timeSum += Date.now() - timestart
+                    reqCount++
+                    if (reqCount==30){
+                    console.log(login_name,": Average time over ", reqCount, " completeLogin calls:", timeSum/reqCount )
+                    reqCount = 0
+                    timeSum = 0
+                    }
+                    })
+              }
+              
+              //setTimeout(getPendingRequest, 100)
+              getPendingRequest()
+              })
     }
-
+    
     var registerLogin = () => {
-
+        
         httpGet('/registerLogin?login=' + encodeURIComponent(login_name), undefined, TK_APP_KEY, TK_APP_SECRET)
-            .then(r => {
-                console.log("registerLogin at :",Date.now())
-                console.log(r.body)
-                Assert.deepStrictEqual(r.body, { data: true })
-                setTimeout(getPendingRequest, 200)
-            })
-            .catch(err => {
-                console.log("caught error", err.message)
-            })
+        .then(r => {
+              console.log("registerLogin at :",Date.now())
+              console.log(r.body)
+              Assert.deepStrictEqual(r.body, { data: true })
+              setTimeout(getPendingRequest, 200)
+              })
+        .catch(err => {
+               console.log("caught error", err.message)
+               })
     }
-
+    
     console.log("registerDevice at :",Date.now())
     httpGet('/registerDevice?devicetoken=' + devicetoken, undefined, TK_APP_KEY, TK_APP_SECRET)
-        .then(r => {
-            console.log("registerDevice at :",Date.now())
-            console.log(r.body);
-            Assert.deepStrictEqual(r.body, {data: {registerDevice: true}})
-            registerLogin();
-            return r.body
-        })
-
+    .then(r => {
+          console.log("registerDevice at :",Date.now())
+          console.log(r.body);
+          Assert.deepStrictEqual(r.body, {data: {registerDevice: true}})
+          registerLogin();
+          return r.body
+          })
+    
 }
 //loadusers()
 
