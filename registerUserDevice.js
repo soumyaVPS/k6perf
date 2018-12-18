@@ -6,10 +6,13 @@ const args = require('yargs').argv;
 const Assert = Chai.assert
 const devicetoken =
 'elYWjUdm1O4:APA91bGveIgqwCegLGp1RTdrUYPB1e7BEMHauKi84nLSDw9ie94ckxDOx9cp9mH4ITue-BxE3SFs28hoQGA7i9ynK6DL70e09k9Qe6bLd1icC5FfDN4RHfJy2YYAgbRavQRtZM-' + (Math.random() * 0xFFFFFF).toString(16).substring(2, 6)
-//const login = `test-login${Math.random()}@example.com`
 const login_name = args.login
-const  TK_APP_KEY = "7472b6380925e165b32acb0871e8f5e5";
-const TK_APP_SECRET = "c8248a05f6c7494391109ac309a5b74d";
+//const  TK_APP_KEY = "7472b6380925e165b32acb0871e8f5e5";
+//const TK_APP_SECRET = "c8248a05f6c7494391109ac309a5b74d";
+//const  TK_APP_KEY = "8c92a928-8315-4869-987b-5fd24353463a";
+//const  TK_APP_SECRET = "OPB5iBOBEiatqX_FnRotfmr0An8ivAYt7LXBU6Ovxmg";
+const  TK_APP_KEY = "56623880-b4a1-4085-bb3e-b32986503c67";
+const  TK_APP_SECRET = "MtmZPhOuQRqoogWI9c49VTh-nVTLATT7EcvjVGk5zP4";
 const httpClient = require('./client')(undefined, TK_APP_KEY, TK_APP_SECRET)
 const Config = require('./config.js');
 const URL = require('url')
@@ -121,8 +124,8 @@ function  register() {
                     })
               }
               
-              //setTimeout(getPendingRequest, 100)
-              getPendingRequest()
+             setTimeout(getPendingRequest, 1000)
+              //getPendingRequest()
               })
     }
     

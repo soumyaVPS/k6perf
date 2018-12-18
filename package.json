@@ -2,7 +2,7 @@
   "name": "k6testsetup",
   "version": "1.0.0",
   "scripts": {
-    "start": "pm2-runtime start ecosystem.config.js --env development"
+    "start": "pm2-runtime start ecosystem.config.js --env \"development login_prefix=llllll\""
   },
   "dependencies": {
     "chai": "^4.1.2",
