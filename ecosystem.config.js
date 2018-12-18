@@ -33,6 +33,7 @@ module.exports = {
     development : {
       user : 'node',
       host : '0.0.0.0',
+      port: process.env.PORT || 3030,
       ref  : 'origin/master',
       repo : 'git@github.com:soumyaVPS/k6perf.git',
       path : '/var/www/production',
