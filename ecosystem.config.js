@@ -18,9 +18,9 @@ module.exports = {
   }],
 
   deploy : {
-    production : {
+    development : {
       user : 'node',
-      host : '212.83.163.1',
+      host : '0.0.0.0',
       ref  : 'origin/master',
       repo : 'git@github.com:soumyaVPS/k6perf.git',
       path : '/var/www/production',
