@@ -1,4 +1,3 @@
-
 const Utils = require('trustedkey-js/utils')
 const JWT = require('jsonwebtoken')
 const Chai = require('chai')
@@ -23,7 +22,7 @@ const WalletUtils = require('./lib/WalletUtils')
 function dumpcreds()
 {
     console.log("login: ", login_name)
-    console.log("devicetoken: ",devicetoken)
+  //  console.log("devicetoken: ",devicetoken)
     console.log("address",  httpClient.address)
     //console.log("credentials: ", httpClient.pair)
     

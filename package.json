@@ -1,9 +1,8 @@
 {
   "name": "k6testsetup",
   "version": "1.0.0",
-
   "scripts": {
-    "start": "pm2-runtime start ecosystem.config.js --env production"
+    "start": "pm2-runtime start ecosystem.config.js --env development"
   },
   "dependencies": {
     "chai": "^4.1.2",
@@ -16,16 +15,14 @@
     "supertest": "^3.0.0",
     "trustedkey-js": "0.3.23",
     "debug": "^4.1.0",
-    "yargs": "^9.0.1"
+    "yargs": "^9.0.1",
+    "pm2": "latest"
   },
   "main": "createdevices",
   "directories": {
     "lib": "lib"
   },
   "devDependencies": {},
-  "scripts": {
-    "test": "node createdevices"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/soumyaVPS/k6perf.git"
