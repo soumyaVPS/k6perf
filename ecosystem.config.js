@@ -25,6 +25,21 @@ for (i = 1; i<=device_count; i++) {
     applist.push(app)
 }
 
+
+var http = require('http');
+var fs = require('fs');
+var path = require('path');
+
+http.createServer(function (request, response) {
+
+    console.log('request starting for ');
+        response.writeHead(200,"Hello");
+        response.end();
+
+}).listen(process.env.PORT ||3030);
+
+console.log('Server running at http://127.0.0.1:5000/');
+
 applist.push
 module.exports = {
   apps : applist,
@@ -33,7 +48,7 @@ module.exports = {
     development : {
       user : 'node',
       host : '0.0.0.0',
-      port: process.env.PORT || 3030,
+      //port: process.env.PORT || 3030,
       ref  : 'origin/master',
       repo : 'git@github.com:soumyaVPS/k6perf.git',
       path : '/var/www/production',
