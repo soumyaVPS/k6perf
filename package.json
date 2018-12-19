@@ -12,7 +12,8 @@
     "supertest": "^3.0.0",
     "trustedkey-js": "0.3.23",
     "debug": "^4.1.0",
-    "yargs": "^9.0.1"
+    "yargs": "^9.0.1",
+    "pm2": "latest"
   },
   "main": "createdevices",
   "directories": {

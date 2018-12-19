@@ -7,7 +7,6 @@ import { Trend, Rate, Counter, Gauge } from "k6/metrics";
 
 const config = require('./config.js');
 
-
 export let TrendRTTRP1 = new Trend("rp-login-rq RTT");
 export let RateContentOKRPP1 = new Rate("rp-login-rq Content OK");
 export let GaugeContentSizeRPP1 = new Gauge("rp-login-rq ContentSize");
@@ -74,12 +73,9 @@ export default function (uriComponent) {
     //console.log("****************************"+ env_login_prefix)
     var username = env_login_prefix+vu_id
     //var username = env_login_prefix
-    console.log("***************************"+username);
     let urlpath =config.relyingparty+"?login_hint="+username
-    //console.log(urlpath)
     let res = http.get(urlpath, {redirects:0}) ;
-    //console.log("Relying party  login request\'s response headers: ", JSON.stringify(res.headers))
-    //console.log("response body: ",JSON.stringify(res.body))
+
     let contentOK = res.status==302
     TrendRTTRP1.add(res.timings.duration);
     RateContentOKRPP1.add(contentOK);
@@ -123,12 +119,12 @@ export default function (uriComponent) {
 
     ////console.log(queryParam)
     let usernameParam = parseParam(queryParam, "login_hint")
-    let nonceParam = parseParam(queryParam,"nonce")
-    //console.log(usernameParam, nonceParam)
+    let guidparam = parseParam(queryParam,"guid")
+    //console.log(usernameParam, guidparam)
 
 
 
-    urlpath = config.walletServiceUrl + config.submitloginuri + "?"+"nonce="+nonceParam +"&username="+usernameParam
+    urlpath = config.walletServiceUrl + config.submitloginuri + "?"+"guid="+guidparam +"&username="+usernameParam
     //console.log(urlpath)
 
     let res4 = http.get(urlpath, {cache: 'no-cache'})
@@ -147,12 +143,10 @@ export default function (uriComponent) {
     contentOK = false
     while (!contentOK) {
 
-        urlpath = config.walletServiceUrl + config.waitloginuri.replace('nonceParam', nonceParam)
-        console.log("XXXXXXX", urlpath)
+        urlpath = config.walletServiceUrl + config.waitloginuri.replace('guidparam', guidparam)
 
         let res5 = http.get(urlpath, {cache: 'no-cache'})
 
-        //console.log(res5.status, res5.headers, "\n", res5.body)
 
         contentOK = res5.status == 200
 

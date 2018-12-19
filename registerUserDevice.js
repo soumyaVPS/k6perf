@@ -107,10 +107,11 @@ function  register() {
               allPendingTimeSum = 0
               }
               if (r.body.data.result != false ) {
-              sigReq = r.body.data
+                sigReq = r.body.data
               //console.log(timestart ," Got a pending request at :",Date.now())
-              deviceRespond(sigReq,{accept_login: true, abort_poll: true, credential: httpClient.pair},sigReq.nonce)
-              .then(r=>{
+                console.log(r.body.data)
+                  deviceRespond(sigReq,{accept_login: true, abort_poll: true, credential: httpClient.pair},sigReq.nonce)
+                    .then(r=>{
                     //console.log("Device responded at :" , Date.now())
                     timeSum += Date.now() - timestart
                     reqCount++

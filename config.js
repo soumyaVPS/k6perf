@@ -7,9 +7,8 @@ module.exports=
     "waitloginuri": `/oauth/IDentify/waitLogin?nonce=nonceParam`,
 
   "callbackRoute": "/oauth/callback",
-  "clientId": "8c92a928-8315-4869-987b-5fd24353463a",
-
-  "clientSecret": "OPB5iBOBEiatqX_FnRotfmr0An8ivAYt7LXBU6Ovxmg",
+    "clientId": "56623880-b4a1-4085-bb3e-b32986503c67",
+    "clientSecret": "MtmZPhOuQRqoogWI9c49VTh-nVTLATT7EcvjVGk5zP4",
   "claims": ["https://auth-stg.trustedkey.com/publicKey"],
   "port": 80,
   "expiryYears": 10,
