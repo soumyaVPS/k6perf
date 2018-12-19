@@ -1,6 +1,10 @@
 {
   "name": "k6testsetup",
   "version": "1.0.0",
+
+  "scripts": {
+    "start": "pm2-runtime start ecosystem.config.js --env production"
+  },
   "dependencies": {
     "chai": "^4.1.2",
     "express": "^4.16.0",
