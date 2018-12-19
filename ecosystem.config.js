@@ -3,6 +3,7 @@ apptemplate = {
         script: './registerUserDevice.js',
     args: ["--delay=0", "--login=qqqqqqqq11"],
     // Options reference: https://pm2.io/doc/en/runtime/reference/ecosystem-file/
+    node_args: ["--expose-gc"],
     instances: 1,
     autorestart: false,
     watch: false,
@@ -22,9 +23,9 @@ for (i = 1; i<=device_count; i++) {
     let login = login_prefix + i
     let app = JSON.parse(JSON.stringify(apptemplate))
     app.args = ["--delay=0", "--login="+login]
+    app.name = "Device " + i
     applist.push(app)
 }
-
 
 var http = require('http');
 var fs = require('fs');
@@ -33,14 +34,12 @@ var path = require('path');
 http.createServer(function (request, response) {
 
     console.log('request starting for ');
+    request.body.
         response.writeHead(200,"Hello");
         response.end();
 
 }).listen(process.env.PORT ||3030);
 
-console.log('Server running at http://127.0.0.1:5000/');
-
-applist.push
 module.exports = {
   apps : applist,
 

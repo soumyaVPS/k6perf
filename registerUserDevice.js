@@ -38,18 +38,6 @@ function deviceRespond(signatureRequest, options, nonce, checksum) {
     delete signatureRequest.objectIds;
     delete signatureRequest.universalLink;
 
-    /*Assert.deepEqual(signatureRequest, {
-     callbackType: 'post',
-     callbackUrl: ExpectedCallbackUrl,
-     nonce: nonce,
-     username: options.username,
-     message: options.message || `Please authenticate ${checksum}`,
-     hostname: '127.0.0.1',
-     client_id: clientId,
-     scope: options.scope
-     })
-     */
-
     // Assemble callback URL for device
     var certs = [];
 
@@ -95,6 +83,8 @@ var reqCount = 0;
 var timeSum = 0;
 var allPendingTimeSum = 0;
 var allPendingCount = 0;
+var dateNow = Date.now()
+var dateLast = dateNow
 
 function register() {
 
@@ -103,13 +93,23 @@ function register() {
         let timestart = Date.now();
         httpGet('/getPendingRequest', undefined, TK_APP_KEY, TK_APP_SECRET).expect(200)
             .then(r => {
-
+                dateNow = Date.now()
                 allPendingTimeSum += Date.now() - timestart;
                 allPendingCount++;
                 if (allPendingCount == 100) {
                     console.log(login_name, ": Average time over ", allPendingCount, " getPendingRequest calls:", allPendingTimeSum / allPendingCount);
                     allPendingCount = 0;
                     allPendingTimeSum = 0
+                    if (dateNow - dateLast >= 60000) {
+                        used = process.memoryUsage().heapUsed / 1024 / 1024;
+                        console.log(`The script used approximately ${Math.round(used * 100) / 100} MB`);
+                        if(global.gc) {
+                            global.gc();
+
+                        }
+                        used = process.memoryUsage().heapUsed / 1024 / 1024;
+                        console.log(`The script uses approximately ${Math.round(used * 100) / 100} MB`);
+                    }
                 }
                 if (r.body.data.result != false) {
                     sigReq = r.body.data;
@@ -132,7 +132,7 @@ function register() {
                         })
                 }
 
-                setTimeout(getPendingRequest, 1000)
+                setTimeout(getPendingRequest, 100)
                 //getPendingRequest()
             })
     };
