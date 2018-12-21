@@ -4,7 +4,7 @@ module.exports=
     //"submitloginuri": `/oauth/IDentify/submitLogin?query=queryParam&username=usernameParam`,
     "submitloginuri": "/oauth/IDentify/submitLogin",
     "waitloginuri": "/oauth/IDentify/waitLogin?",
-    "notifyWalletUrl":"http://localhost:8090/notified",
+    "notifyWalletUrl":"http://tk-pmwallets.herokuapp.com/notified",
   "callbackRoute": "/oauth/callback",
     "clientId": "56623880-b4a1-4085-bb3e-b32986503c67",
     "clientSecret": "MtmZPhOuQRqoogWI9c49VTh-nVTLATT7EcvjVGk5zP4",

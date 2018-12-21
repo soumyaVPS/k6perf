@@ -46,7 +46,7 @@ export let GaugeContentSizeRP7 = new Gauge("tk-rp-callback ContentSize");
 export let AuthReqErrorsRP7 = new Counter("tk-rp-callback errors");
 
 let env_login_prefix = __ENV.login_prefix;
-////console.log(env_login_prefix)
+//////console.log(env_login_prefix)
 
 
 
@@ -66,11 +66,11 @@ export default function (uriComponent) {
     var vuId=`${__VU}`
 
     var loginId = env_login_prefix+vuId
-    console.log("***************************"+loginId);
+    //console.log("***************************"+loginId);
 
 
     let urlpath =config.relyingparty+"?login_hint="+loginId
-    console.log(urlpath)
+    //console.log(urlpath)
     let res = http.get(urlpath, {redirects:0}) ;
 
     let contentOK = res.status==302
@@ -82,13 +82,13 @@ export default function (uriComponent) {
     //redirects to trustedkey wallet oauth/authorize
 
     urlpath = res.headers["Location"]
-    console.log(urlpath)
+    //console.log(urlpath)
     let res2 = http.get(urlpath,
         {headers: {"referer":config.relyingparty},
          redirects: 0})
 
-    //console.log("wallet  oauth/authorize request\'s response headers: ", JSON.stringify(res2.headers))
-    //console.log("response body: ",res2.body)
+    ////console.log("wallet  oauth/authorize request\'s response headers: ", JSON.stringify(res2.headers))
+    ////console.log("response body: ",res2.body)
     contentOK = res2.status==302
     TrendRTTTK2.add(res2.timings.duration);
     RateContentOKTK2.add(contentOK);
@@ -100,10 +100,10 @@ export default function (uriComponent) {
     urlpath = res2.headers["Location"]
     if (urlpath.indexOf("http")==-1)
         urlpath=config.walletServiceUrl+urlpath
-    console.log(urlpath)
+    //console.log(urlpath)
     res = http.get(urlpath,
         {headers: {"referer":config.relyingparty}, redirects: 0}) //TODO:: referer  is not right
-    //console.log("login.html response:", res3.headers, res3.status, res3.body)
+    ////console.log("login.html response:", res3.headers, res3.status, res3.body)
 
 
     contentOK = res.status==200
@@ -116,15 +116,15 @@ export default function (uriComponent) {
     let loc = res2.headers["Location"]
     let queryParam = loc.substring(loc.indexOf('?')).substring(1)
 
-    ////console.log(queryParam)
+    //////console.log(queryParam)
     //let usernameParam = parseParam(queryParam, "login_hint") //TODO::Validate queryparams
     let guidparam = parseParam(queryParam,"guid")
-    //console.log(usernameParam, guidparam)
+    ////console.log(usernameParam, guidparam)
     urlpath = config.walletServiceUrl + config.submitloginuri + "?"+"guid="+guidparam +"&username="+loginId
-    //console.log(urlpath)
+    ////console.log(urlpath)
 
     res = http.get(urlpath, {cache: 'no-cache'})
-    //console.log("submitlogin response:", res4.headers, res4.status, res4.body)
+    ////console.log("submitlogin response:", res4.headers, res4.status, res4.body)
 
     contentOK = res.status == 200
     TrendRTTTK4.add(res.timings.duration);
@@ -133,14 +133,14 @@ export default function (uriComponent) {
     AuthReqErrorsTK4.add(!contentOK);
 
     let jsonResp =res.body
-    //console.log(res4.headers, "\n", jsonResp)
+    ////console.log(res4.headers, "\n", jsonResp)
 
     //wallet call
 
     urlpath = config.notifyWalletUrl + "?login=" + loginId
 
     res = http.get(urlpath, {cache: 'no-cache'})
-    console.log("notifyWallet Response",res.status, res.body)
+    //console.log("notifyWallet Response",res.status, res.body)
 
     contentOK = res.status == 200
     TrendRTTTK5.add(res.timings.duration);
@@ -153,21 +153,21 @@ export default function (uriComponent) {
     while (!contentOK) {
 
         urlpath = config.walletServiceUrl + config.waitloginuri + "guid=" + guidparam
-        console.log(urlpath)
+        //console.log(urlpath)
         let res = http.get(urlpath, {cache: 'no-cache'})
 
-        console.log(res.status)
+        //console.log(res.status)
         for (var p in res.headers) {
             if (res2.headers.hasOwnProperty(p)) {
-                console.log(p + " : " + res.headers[p]);
+                //console.log(p + " : " + res.headers[p]);
             }
         }
-        console.log(res.body)
+        //console.log(res.body)
 
         if (res.status == 200) {
             contentOK = true
         }
-        //console.log(res.status, res5.body, res5.headers)
+        ////console.log(res.status, res5.body, res5.headers)
         TrendRTTTK6.add(res.timings.duration);
         RateContentOKTK6.add(contentOK);
         GaugeContentSizeTK6.add(res.body.length);
@@ -176,12 +176,12 @@ export default function (uriComponent) {
             break
         }
     }
-
+/*
     if (contentOK)
     {
         let urlPath = res.body.url
         res = http.get(urlpath, {cache: 'no-cache'})
-        console.log("RP callback response", res.status, res.body)
+        //console.log("RP callback response", res.status, res.body)
 
         contentOK = res.status == 200
         TrendRTTRP7.add(res.timings.duration);
@@ -192,8 +192,8 @@ export default function (uriComponent) {
     }
         //redirect back to heroku oauth
         //let json = res.body
-        //console.log(json)
+        ////console.log(json)
 
-
+*/
 
 };
