@@ -7,7 +7,6 @@ import { Trend, Rate, Counter, Gauge } from "k6/metrics";
 
 const config = require('./config.js');
 
-
 export let TrendRTTRP1 = new Trend("rp-login-rq RTT");
 export let RateContentOKRPP1 = new Rate("rp-login-rq Content OK");
 export let GaugeContentSizeRPP1 = new Gauge("rp-login-rq ContentSize");
@@ -29,32 +28,19 @@ export let RateContentOKTK4 = new Rate("tk-submit-login Content OK");
 export let GaugeContentSizeTK4 = new Gauge("tk-submit-login ContentSize");
 export let AuthReqErrorsTK4 = new Counter("tk-submit-login errors");
 
-export let TrendRTTTK5 = new Trend("tk-wait-login RTT");
-export let RateContentOKTK5 = new Rate("tk-wait-login Content OK ");
-export let GaugeContentSizeTK5 = new Gauge("tk-wait-login ContentSize");
-export let AuthReqErrorsTK5 = new Counter("tk-wait-login errors");
+export let TrendRTTTK5 = new Trend("tk-wallet-notify RTT");
+export let RateContentOKTK5 = new Rate("tk-wallet-notify Content OK");
+export let GaugeContentSizeTK5 = new Gauge("tk-wallet-notify ContentSize");
+export let AuthReqErrorsTK5 = new Counter("tk-wallet-notify errors");
+
+
+export let TrendRTTTK6 = new Trend("tk-waitlogin RTT");
+export let RateContentOKTK6 = new Rate("tk-waitlogin Content OK");
+export let GaugeContentSizeTK6 = new Gauge("tk-waitlogin ContentSize");
+export let AuthReqErrorsTK6 = new Counter("tk-waitlogin errors");
 
 let env_login_prefix = __ENV.login_prefix;
 ////console.log(env_login_prefix)
-
-export let options = {
-    /*thresholds: {
-        "RTT": [
-            "p(99)<300",
-            "p(70)<250",
-            "avg<200",
-            "med<150",
-            "min<100",
-        ],
-        "Content OK": ["rate>0.95"],
-        "ContentSize": ["value<4000"],
-        "Errors": ["count<100"]
-    }
-        vus: 1,
-    duration: "1m"
-    */
-   };
-
 
 function parseParam(query, qp)
 {
@@ -69,17 +55,16 @@ function parseParam(query, qp)
 
 export default function (uriComponent) {
 
-    var vu_id=`${__VU}`
+    var vuId=`${__VU}`
 
-    //console.log("****************************"+ env_login_prefix)
-    var username = env_login_prefix+vu_id
-    //var username = env_login_prefix
-    console.log("***************************"+username);
-    let urlpath =config.relyingparty+"?login_hint="+username
-    //console.log(urlpath)
+    var loginId = env_login_prefix+vuId
+    console.log("***************************"+loginId);
+
+
+    let urlpath =config.relyingparty+"?login_hint="+loginId
+    console.log(urlpath)
     let res = http.get(urlpath, {redirects:0}) ;
-    //console.log("Relying party  login request\'s response headers: ", JSON.stringify(res.headers))
-    //console.log("response body: ",JSON.stringify(res.body))
+
     let contentOK = res.status==302
     TrendRTTRP1.add(res.timings.duration);
     RateContentOKRPP1.add(contentOK);
@@ -89,7 +74,7 @@ export default function (uriComponent) {
     //redirects to trustedkey wallet oauth/authorize
 
     urlpath = res.headers["Location"]
-    //console.log(urlpath)
+    console.log(urlpath)
     let res2 = http.get(urlpath,
         {headers: {"referer":config.relyingparty},
          redirects: 0})
@@ -104,17 +89,19 @@ export default function (uriComponent) {
 
 
     //oauth redirects to login.html. Shows image and downloads scripts. the scripts invoke submitlogin and waitlogin
-    urlpath = config.walletServiceUrl + res2.headers["Location"]
-    //console.log(urlpath)
-    let res3 = http.get(urlpath,
+    urlpath = res2.headers["Location"]
+    if (urlpath.indexOf("http")==-1)
+        urlpath=config.walletServiceUrl+urlpath
+    console.log(urlpath)
+    res = http.get(urlpath,
         {headers: {"referer":config.relyingparty}, redirects: 0}) //TODO:: referer  is not right
     //console.log("login.html response:", res3.headers, res3.status, res3.body)
 
 
-    contentOK = res3.status==200
-    TrendRTTTK3.add(res3.timings.duration);
+    contentOK = res.status==200
+    TrendRTTTK3.add(res.timings.duration);
     RateContentOKTK3.add(contentOK);
-    GaugeContentSizeTK3.add(res3.body.length);
+    GaugeContentSizeTK3.add(res.body.length);
     AuthReqErrorsTK3.add(!contentOK);
 
     //construct submitlogin
@@ -122,51 +109,83 @@ export default function (uriComponent) {
     let queryParam = loc.substring(loc.indexOf('?')).substring(1)
 
     ////console.log(queryParam)
-    let usernameParam = parseParam(queryParam, "login_hint")
-    let nonceParam = parseParam(queryParam,"nonce")
-    //console.log(usernameParam, nonceParam)
-
-
-
-    urlpath = config.walletServiceUrl + config.submitloginuri + "?"+"nonce="+nonceParam +"&username="+usernameParam
+    //let usernameParam = parseParam(queryParam, "login_hint") //TODO::Validate queryparams
+    let guidparam = parseParam(queryParam,"guid")
+    //console.log(usernameParam, guidparam)
+    urlpath = config.walletServiceUrl + config.submitloginuri + "?"+"guid="+guidparam +"&username="+loginId
     //console.log(urlpath)
 
-    let res4 = http.get(urlpath, {cache: 'no-cache'})
+    res = http.get(urlpath, {cache: 'no-cache'})
     //console.log("submitlogin response:", res4.headers, res4.status, res4.body)
 
-    contentOK = res4.status == 200
-    TrendRTTTK4.add(res4.timings.duration);
+    contentOK = res.status == 200
+    TrendRTTTK4.add(res.timings.duration);
     RateContentOKTK4.add(contentOK);
-    GaugeContentSizeTK4.add(res4.body.length);
+    GaugeContentSizeTK4.add(res.body.length);
     AuthReqErrorsTK4.add(!contentOK);
 
-    let jsonResp =res4.body
+    let jsonResp =res.body
     //console.log(res4.headers, "\n", jsonResp)
+
+    //wallet call
+
+    urlpath = config.notifyWalletUrl + "?login=" + loginId
+
+    res = http.get(urlpath, {cache: 'no-cache'})
+    console.log("notifyWallet Response",res.status, res.body)
+
+    contentOK = res.status == 200
+    TrendRTTTK5.add(res.timings.duration);
+    RateContentOKTK5.add(contentOK);
+    GaugeContentSizeTK5.add(res.body.length);
+    AuthReqErrorsTK5.add(!contentOK);
 
     //waitlogin
     contentOK = false
     while (!contentOK) {
 
-        urlpath = config.walletServiceUrl + config.waitloginuri.replace('nonceParam', nonceParam)
-        console.log("XXXXXXX", urlpath)
+        urlpath = config.walletServiceUrl + config.waitloginuri + "guid=" + guidparam
+        console.log(urlpath)
+        let res = http.get(urlpath, {cache: 'no-cache'})
 
-        let res5 = http.get(urlpath, {cache: 'no-cache'})
+        console.log(res.status)
+        for (var p in res.headers) {
+            if (res2.headers.hasOwnProperty(p)) {
+                console.log(p + " : " + res.headers[p]);
+            }
+        }
+        console.log(res.body)
 
-        //console.log(res5.status, res5.headers, "\n", res5.body)
-
-        contentOK = res5.status == 200
-
-        //console.log(res5.status, res5.body, res5.headers)
-        TrendRTTTK5.add(res5.timings.duration);
-        RateContentOKTK5.add(contentOK);
-        GaugeContentSizeTK5.add(res5.body.length);
-        AuthReqErrorsTK5.add(!contentOK);
-
-
-        //redirect back to heroku oauth
-        //let json = res5.body
-        //console.log(json)
+        if (res.status == 200) {
+            contentOK = true
+        }
+        //console.log(res.status, res5.body, res5.headers)
+        TrendRTTTK6.add(res.timings.duration);
+        RateContentOKTK6.add(contentOK);
+        GaugeContentSizeTK6.add(res.body.length);
+        AuthReqErrorsTK6.add(!contentOK);
+        if (res.status !=408 && !contentOK) {
+            break
+        }
     }
+
+    if (contentOK)
+    {
+        let urlPath = res.body.url
+        res = http.get(urlpath, {cache: 'no-cache'})
+        console.log("RP callback response", res.status, res.body)
+
+        contentOK = res.status == 200
+        TrendRTTTK7.add(res.timings.duration);
+        RateContentOKTK7.add(contentOK);
+        GaugeContentSizeTK7.add(res.body.length);
+        AuthReqErrorsTK7.add(!contentOK);
+
+    }
+        //redirect back to heroku oauth
+        //let json = res.body
+        //console.log(json)
+
 
 
 };

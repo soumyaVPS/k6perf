@@ -18,7 +18,8 @@ const App = Config.walletServiceUrl
 module.exports = function(pair, appKey, appSecret) {
     pair = pair || Utils.generateKeyPair()
     pair.address = Utils.userPubKeyHexToAddress(pair.pubKeyHex)
-
+    appKey = appKey
+    appSecret = appSecret
     return {
         pair,
         address: pair.address,

@@ -1,6 +1,6 @@
 apptemplate = {
     name: 'DEVICE 2',
-        script: './registerUserDevice.js',
+        script: './pm2Wallet.js',
     args: ["--delay=0", "--login=qqqqqqqq11"],
     // Options reference: https://pm2.io/doc/en/runtime/reference/ecosystem-file/
     node_args: ["--expose-gc"],
@@ -29,24 +29,29 @@ for (i = 1; i<=device_count; i++) {
     applist.push(app)
 }
 
-//move to app
-var http = require('http');
-var fs = require('fs');
-var path = require('path');
-
-
-http.createServer(function (request, response) {
-
-    console.log('request starting for ');
-    request.body.
-        response.writeHead(200,"Hello");
-        response.end();
-
-}).listen(process.env.PORT ||3030);
-
+listenerApp =
+    {name: 'Listener',
+        script: './notificationListener.js',
+        node_args: ["--expose-gc"],
+        args : ["--login="+login_prefix],
+        instances: 1,
+        autorestart: false,
+        watch: false,
+        max_memory_restart: '1G',
+        env: {
+            NODE_ENV: 'development'
+        },
+        env_production: {
+            NODE_ENV: 'production'
+        }
+    }
+applist.push(listenerApp)
 
 used = process.memoryUsage().heapUsed / 1024 / 1024;
 console.log(`The script uses approximately ${Math.round(used * 100) / 100} MB`);
+
+
+
 module.exports = {
   apps : applist,
 
