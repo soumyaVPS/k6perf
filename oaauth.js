@@ -48,23 +48,6 @@ export let AuthReqErrorsRP7 = new Counter("tk-rp-callback errors");
 let env_login_prefix = __ENV.login_prefix;
 ////console.log(env_login_prefix)
 
-export let options = {
-    /*thresholds: {
-        "RTT": [
-            "p(99)<300",
-            "p(70)<250",
-            "avg<200",
-            "med<150",
-            "min<100",
-        ],
-        "Content OK": ["rate>0.95"],
-        "ContentSize": ["value<4000"],
-        "Errors": ["count<100"]
-    }
-        vus: 1,
-    duration: "1m"
-    */
-   };
 
 
 function parseParam(query, qp)

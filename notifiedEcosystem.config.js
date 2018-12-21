@@ -39,7 +39,8 @@ listenerApp =
         watch: false,
         max_memory_restart: '1G',
         env: {
-            NODE_ENV: 'development'
+            NODE_ENV: 'development',
+            PORT:process.env.PORT
         },
         env_production: {
             NODE_ENV: 'production'
