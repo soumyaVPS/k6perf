@@ -7,6 +7,7 @@ import { Trend, Rate, Counter, Gauge } from "k6/metrics";
 
 const config = require('./config.js');
 
+
 export let TrendRTTRP1 = new Trend("rp-login-rq RTT");
 export let RateContentOKRPP1 = new Rate("rp-login-rq Content OK");
 export let GaugeContentSizeRPP1 = new Gauge("rp-login-rq ContentSize");
@@ -39,8 +40,32 @@ export let RateContentOKTK6 = new Rate("tk-waitlogin Content OK");
 export let GaugeContentSizeTK6 = new Gauge("tk-waitlogin ContentSize");
 export let AuthReqErrorsTK6 = new Counter("tk-waitlogin errors");
 
+export let TrendRTTRP7 = new Trend("tk-rp-callback RTT");
+export let RateContentOKRP7 = new Rate("tk-rp-callback Content OK");
+export let GaugeContentSizeRP7 = new Gauge("tk-rp-callback ContentSize");
+export let AuthReqErrorsRP7 = new Counter("tk-rp-callback errors");
+
 let env_login_prefix = __ENV.login_prefix;
 ////console.log(env_login_prefix)
+
+export let options = {
+    /*thresholds: {
+        "RTT": [
+            "p(99)<300",
+            "p(70)<250",
+            "avg<200",
+            "med<150",
+            "min<100",
+        ],
+        "Content OK": ["rate>0.95"],
+        "ContentSize": ["value<4000"],
+        "Errors": ["count<100"]
+    }
+        vus: 1,
+    duration: "1m"
+    */
+   };
+
 
 function parseParam(query, qp)
 {
@@ -176,10 +201,10 @@ export default function (uriComponent) {
         console.log("RP callback response", res.status, res.body)
 
         contentOK = res.status == 200
-        TrendRTTTK7.add(res.timings.duration);
-        RateContentOKTK7.add(contentOK);
-        GaugeContentSizeTK7.add(res.body.length);
-        AuthReqErrorsTK7.add(!contentOK);
+        TrendRTTRP7.add(res.timings.duration);
+        RateContentOKRP7.add(contentOK);
+        GaugeContentSizeRP7.add(res.body.length);
+        AuthReqErrorsRP7.add(!contentOK);
 
     }
         //redirect back to heroku oauth

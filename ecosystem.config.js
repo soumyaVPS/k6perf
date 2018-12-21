@@ -18,9 +18,7 @@ apptemplate = {
 login_prefix= process.env.login_prefix
 device_count= process.env.device_count
 console.log(process.env, login_prefix, device_count)
-
 applist = []
-
 for (i = 1; i<=device_count; i++) {
     let login = login_prefix + i
     let app = JSON.parse(JSON.stringify(apptemplate))
@@ -29,11 +27,9 @@ for (i = 1; i<=device_count; i++) {
     applist.push(app)
 }
 
-//move to app
 var http = require('http');
 var fs = require('fs');
 var path = require('path');
-
 
 http.createServer(function (request, response) {
 
@@ -43,8 +39,6 @@ http.createServer(function (request, response) {
         response.end();
 
 }).listen(process.env.PORT ||3030);
-
-
 used = process.memoryUsage().heapUsed / 1024 / 1024;
 console.log(`The script uses approximately ${Math.round(used * 100) / 100} MB`);
 module.exports = {
