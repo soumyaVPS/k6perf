@@ -1,6 +1,6 @@
 apptemplate = {
     name: 'DEVICE 2',
-        script: './pm2Wallet.js',
+        script: './pm2wallet.js',
     args: ["--delay=0", "--login=qqqqqqqq11"],
     // Options reference: https://pm2.io/doc/en/runtime/reference/ecosystem-file/
     node_args: ["--expose-gc"],
