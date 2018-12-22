@@ -44,8 +44,28 @@ export let RateContentOKTK7 = new Rate("tk-wait-login Content OK ");
 export let GaugeContentSizeTK7 = new Gauge("tk-wait-login ContentSize");
 export let AuthReqErrorsTK7 = new Counter("tk-wait-login errors");
 
-let envLoginPrefix = __ENV.login_prefix;
+import UserWallet from './registerUserDevice.js'
 
+let envLoginPrefix = __ENV.login_prefix;
+////console.log(env_login_prefix)
+let envDeviceCount = __ENV.device_count
+let userWallets = {}
+for (let i = 1; i <= envDeviceCount; i++)
+{
+    let wallet = new UserWallet(envLoginPrefix + i)
+    let req =http.get(wallet.registerDevice())
+    let res = http.get(req.path,req.options)
+    if (res.status == 200) {
+        req = wallet.registerLogin()
+        res = http.get(req.path, req.options)
+        if (res.status = 200)
+        {
+            console.log("registered wallet for: ", envLoginPrefix+i)
+        }
+
+    }
+    userWallets[envLoginPrefix + 1] = wallet
+}
 
 
 function parseParam(query, qp)
@@ -65,7 +85,6 @@ export default function (uriComponent) {
 
     //console.log("****************************"+ env_login_prefix)
     var username = envLoginPrefix+vu_id
-    username = "soumya.aithal@trustedkey.com"
 
     let urlpath =config.relyingparty+"?login_hint="+username
     let res = http.get(urlpath, {redirects:0}) ;
@@ -79,24 +98,12 @@ export default function (uriComponent) {
     //redirects to trustedkey wallet oauth/authorize
 
     urlpath = res.headers["Location"]
-
-    for (var p in res.headers) {
-        if (res.headers.hasOwnProperty(p)) {
-            console.log(p + " : " + res.headers[p]);
-        }
-    }
-    console.log("\n redirect to :",res.status, ":", urlpath)
+    console.log(urlpath)
     let res2 = http.get(urlpath,
         {headers: {"referer":config.relyingparty},
          redirects: 0})
 
-    console.log("\n wallet  oauth/authorize request\'s response headers: ")
-    for (var p in res2.headers) {
-        if (res2.headers.hasOwnProperty(p)) {
-            console.log(p + " : " + res2.headers[p]);
-        }
-    }
-    console.log("\n res2 response body: ",res2.body)
+    //console.log("response body: ",res2.body)
     contentOK = res2.status==302
     TrendRTTTK2.add(res2.timings.duration);
     RateContentOKTK2.add(contentOK);
@@ -106,10 +113,10 @@ export default function (uriComponent) {
 
     //oauth redirects to login.html. Shows image and downloads scripts. the scripts invoke submitlogin and waitlogin
     urlpath = config.walletServiceUrl + res2.headers["Location"]
-    console.log("\n", urlpath)
+    //console.log(urlpath)
     let res3 = http.get(urlpath,
         {headers: {"referer":config.relyingparty}, redirects: 0}) //TODO:: referer  is not right
-    console.log("res3 response:", res3.headers, res3.status, res3.body)
+    //console.log("login.html response:", res3.headers, res3.status, res3.body)
 
 
     contentOK = res3.status==200
@@ -142,6 +149,38 @@ export default function (uriComponent) {
 
     let jsonResp =res4.body
     //console.log(res4.headers, "\n", jsonResp)
+
+    //getPendingRequest
+    let wallet = userWallets[username]
+    contentOK = false
+
+    while (!contentOK) {
+        let req = wallet.getPendingRequest()
+        res = http.get(req.path, req.options)
+        contentOK = res.status == 200
+        TrendRTTTK5.add(res.timings.duration);
+        RateContentOKTK5.add(contentOK);
+        GaugeContentSizeTK5.add(res.body.length);
+        AuthReqErrorsTK5.add(!contentOK);
+
+        if (req.status == 200  && req.body.data.result != false)
+        {
+            contentOK = true
+            let sigReq = r.body.data
+            req = wallet.completeLogin(sigReq,{accept_login: true, abort_poll: true, credential: httpClient.pair},sigReq.nonce)
+            res = http.post(req.path,req.payload, req.body )
+            contentOK = res.status == 200
+            TrendRTTTK6.add(res.timings.duration);
+            RateContentOKTK6.add(contentOK);
+            GaugeContentSizeTK6.add(res.body.length);
+            AuthReqErrorsTK6.add(!contentOK);
+
+        }
+    }
+
+
+    //completeLogin
+
 
     //waitlogin
     contentOK = false

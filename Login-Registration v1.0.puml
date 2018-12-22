@@ -2,14 +2,12 @@
 
 title Login/Registration
 
-participant "User\n oauth.js" as User
+participant "loadimpact\n oauth.js" as User
 participant "Wallet/Device \n simulation \n registerUserDevice.js" as Wallet
 participant "Relying\nParty(heroku)" as RP
 participant "wallet-stg \nWallet\nServices" as WS
-participant "Relying Party\nServices" as RPS
-
+participant "wallet"
 box "TK Service" #LightBlue
-	participant RPS
 	participant WS
 end box
 
@@ -17,37 +15,34 @@ end box
 Wallet->WS: registerdevice(0.4s), registerlgoin (0.46s)
 User->RP: enter unique ID(0.084s)\n(https://soumya-rp-ip-stg-example.herokuapp.com/login?login_hint=abcdabcdc0@example.com)
 RP-->User:Redirect to tk/oauth/authorize
-note over RPS: /oauth/authorize
-User->RPS: generate login(0.039s) / \nuser info request\n(nonce,state) \nhttps://wallet-stg.trustedkey.com/oauth/authorize?\nclient_id=8c92a928-8315-4869-987b-5fd24353463a&\nredirect_uri=https%3A%2F%2Fsoumya-rp-ip-stg-example.herokuapp.com%2Foauth%2Fcallback&\nscope=openid%20https%3A%2F%2Fauth.trustedkey.com%2Fuser_sign&\nresponse_type=code&\nstate=login&\nlogin_hint=abcdabcdc0%40example.com
+note over WS: /oauth/authorize
+User->WS: generate login(0.039s) / \nuser info request\n(nonce,state) \nhttps://wallet-stg.trustedkey.com/oauth/authorize?\nclient_id=8c92a928-8315-4869-987b-5fd24353463a&\nredirect_uri=https%3A%2F%2Fsoumya-rp-ip-stg-example.herokuapp.com%2Foauth%2Fcallback&\nscope=openid%20https%3A%2F%2Fauth.trustedkey.com%2Fuser_sign&\nresponse_type=code&\nstate=login&\nlogin_hint=abcdabcdc0%40example.com
 
-WS->RPS: query wallet information
-WS-->RPS: return hash(public key)
-RPS-->WS: push notification
-
-User->RPS: (0.304s)https://wallet-stg.trustedkey.com/oauth/IDentify/submitLogin?nonce=6a2598940e05599884d588c41cccf945a847100737d1&username=abcdabcdc0%40example.com(0.039s)
-User->RPS: (0.59s) https://wallet-stg.trustedkey.com/oauth/IDentify/waitLogin?nonce=6a2598940e05599884d588c41cccf945a847100737d1 (0.79s)
-
+User->WS: (0.304s)https://wallet-stg.trustedkey.com/oauth/IDentify/submitLogin?nonce=6a2598940e05599884d588c41cccf945a847100737d1&username=abcdabcdc0%40example.com(0.039s)
+User->wallet
 group (~0.9s)
-Wallet->RPS: "getPendingRequest(~0.35s)"
+Wallet->WS: "getPendingRequest(~0.35s)"
 Wallet->Wallet: sign id_token (nonce)
-Wallet->RPS: provide id_token(0.37s) \nhttps://wallet-stg.trustedkey.com/oauth/completeLogin?id_token=eyJhbGciOiJWY0NjA2YjI2ZDc5YSIsImF1ZCI6WyI1NGNjNmQzNT3qEQPYL49g\n&result=success\n&nonce=d17676897c257def12bccea5faa5882fd374433323ca"
-RPS-->Wallet: ack
+Wallet->WS: provide id_token(0.37s) \nhttps://wallet-stg.trustedkey.com/oauth/completeLogin?id_token=eyJhbGciOiJWY0NjA2YjI2ZDc5YSIsImF1ZCI6WyI1NGNjNmQzNT3qEQPYL49g\n&result=success\n&nonce=d17676897c257def12bccea5faa5882fd374433323ca"
+WS-->Wallet: ack
 end
+wallet-->User: 200
 
-RPS->RPS: validate id_token (nonce) w/ publickey
+User->WS: (0.59s) https://wallet-stg.trustedkey.com/oauth/IDentify/waitLogin?nonce=6a2598940e05599884d588c41cccf945a847100737d1 (0.79s)
+
+WS->WS: validate id_token (nonce) w/ publickey
 WS-->User: return waitlogin (body:sub, url:soumya-rp-ip-stg-example.herokuapp.com/oauth/callback?code=09f436635d1c7f056f5584583ae2b&state=login"\n (redirect to Relying Party\n with authorization code)
 User->RP: https://soumya-rp-ip-stg-example.herokuapp.com/oauth/callback?\ncode=78e8aea53222efc98e0737b97ee2175d533513ecbc3707f3d18eaa9b604a087d&state=login
 
-RP->RPS: exchange code for access_token
-note over RPS: /oauth/token
-RPS-->RP: access_token & id_token (nonce)
+RP->WS: exchange code for access_token
+note over WS: /oauth/token
+WS-->RP: access_token & id_token (nonce)
 RP->RP: validate id_token (nonce)
 
-RP->RPS: call user info API with access_token
-note over RPS: /oauth/user
+RP->WS: call user info API with access_token
 
-RPS->RPS: decrypt with access_token
-RPS-->RP: response with user info
+WS->WS: decrypt with access_token
+WS-->RP: response with user info
 RP-->User: response to oauth/callback
 
 

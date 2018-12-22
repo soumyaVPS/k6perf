@@ -1,32 +1,20 @@
 {
   "name": "k6testsetup",
   "version": "1.0.0",
-
   "scripts": {
-    "start": "pm2-runtime start ecosystem.config.js --env production"
+    "test": "node createdevices"
   },
   "dependencies": {
-    "chai": "^4.1.2",
-    "express": "^4.16.0",
     "jsonfile": "^4.0.0",
     "jsonwebtoken": "^8.2.0",
-    "jsrsasign": "github:enumatech/jsrsasign#add_ski",
-    "k6": "0.0.0",
-    "querystring": "^0.2.0",
-    "supertest": "^3.0.0",
-    "trustedkey-js": "0.3.23",
-    "debug": "^4.1.0",
-    "yargs": "^9.0.1",
-    "pm2": "latest"
+    "jsrsasign": "github:enumatech/jsrsasign#add_ski", "k6": "0.0.0",
+    "trustedkey-js": "0.3.23"
   },
   "main": "createdevices",
   "directories": {
     "lib": "lib"
   },
   "devDependencies": {},
-  "scripts": {
-    "test": "node createdevices"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/soumyaVPS/k6perf.git"
