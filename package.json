@@ -1,16 +1,23 @@
 {
-  "name": "k6testsetup",
+  "name": "PerfSyntheticWallets",
   "version": "1.0.0",
   "scripts": {
-    "test": "node createdevices"
+    "start": "node walletproc.js"
   },
   "dependencies": {
+    "chai": "^4.1.2",
+    "express": "^4.16.0",
     "jsonfile": "^4.0.0",
     "jsonwebtoken": "^8.2.0",
-    "jsrsasign": "github:enumatech/jsrsasign#add_ski", "k6": "0.0.0",
-    "trustedkey-js": "0.3.23"
+    "jsrsasign": "github:enumatech/jsrsasign#add_ski",
+    "k6": "0.0.0",
+    "querystring": "^0.2.0",
+    "trustedkey-js": "0.3.23",
+    "yargs": "^9.0.1",
+    "aws-sdk": "^2.382.0",
+    "supertest": "^3.3.0"
   },
-  "main": "createdevices",
+  "main": "weblistener",
   "directories": {
     "lib": "lib"
   },

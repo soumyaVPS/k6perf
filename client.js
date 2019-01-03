@@ -2,8 +2,6 @@
 const WalletUtils = require('./lib/WalletUtils')
 const Utils = require('trustedkey-js/utils')
 const Request = require('supertest')
-const Express = require('express')
-//const App = Express()
 const Config = require('./config')
 const App = Config.walletServiceUrl
 
@@ -25,18 +23,10 @@ module.exports = function(pair, appKey, appSecret) {
 
         get: (path, options) => {
             const {app = App, credential = pair, agent = false, key = appKey, secret = appSecret, json = true} = options || {}
-            //console.log("*********************", Date.now())
-            //let req = agent || Request(app)
-
             req = Request(app).get(path)
                 .set('Accept', json ? 'application/json' : 'text/plain')
             req.set('Authorization', WalletUtils.getAuthorizationHeader(req.url, credential, null, key, secret))
-            //console.log("**",Date.now()) //~0.013s to compose  authz headers
-
             return req
-
-
-
         },
 
         post: (path, body, options) => {
@@ -47,7 +37,6 @@ module.exports = function(pair, appKey, appSecret) {
                 .set('Accept', json ? 'application/json' : 'text/plain')
                 .set('Content-Type', 'application/json')
             let authzheader = WalletUtils.getAuthorizationHeader(req.url, credential, body, key, secret)
-            //console.log("Before Post ", Date.now())
             return req
                 .set('Authorization', authzheader)
                 .send(body)
