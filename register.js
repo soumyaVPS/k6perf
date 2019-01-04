@@ -6,8 +6,8 @@ const args = require('yargs').argv;
 
 const Assert = Chai.assert
 
-const Config = require('./config.js');
-const Storage = require('./walletdbdb.js')
+const Config = require('./config');
+const Storage = require('./walletdb')
 
 
 function genDevToken() {

@@ -1,13 +1,11 @@
-const Utils = require('trustedkey-js/utils');
-const JWT = require('jsonwebtoken');
 const Chai = require('chai');
-const args = require('yargs').argv;
 Assert = Chai.assert
+var app = express();
 
 const Config = require('./config.js');
 const URL = require('url');
 const WalletUtils = require('./lib/WalletUtils');
-const Storage = require('./walletddb')
+const Storage = require('./walletdb')
 const Register = require ('./register')
 function completeLogin(signatureRequest, options, nonce, checksum) {
     delete signatureRequest.claims;
@@ -122,6 +120,14 @@ sqs.receiveMessage(params, function(err, data) {
             }
         });
     }
+});
+
+
+port = process.env.PORT ||3000
+//console.log(port)
+app.listen(port, function() {
+
+    //console.log('Example app listening on port 8090!');
 });
 
 

@@ -2,8 +2,8 @@ var AWS = require('aws-sdk');
 const Config = require('./config.js')
 // Set the region
 AWS.config.update({
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID| Config.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_KEY|Config.AWS_SECRET_KEY,
+    accessKeyId: process.env.ACCESS_KEY| Config.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.ACCESS_SECRET|Config.AWS_SECRET_KEY,
     region: Config.awsRegion
 });
 
