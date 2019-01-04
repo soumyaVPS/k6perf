@@ -1,5 +1,6 @@
 const Chai = require('chai');
 Assert = Chai.assert
+var express = require('express');
 var app = express();
 
 const Config = require('./config.js');
@@ -75,10 +76,10 @@ async function authn (deviceToken, payload){
 }
 
 
-var AWS = require('aws-sdk');
+// var AWS = require('aws-sdk');
 
 // Create SQS service object
-var sqs = new AWS.SQS({apiVersion: '2012-11-05'});
+// var sqs = new AWS.SQS({apiVersion: '2012-11-05'});
 var queueURL = Config.awsSQSUrl;
 var params = {
     AttributeNames: [
@@ -92,11 +93,12 @@ var params = {
     VisibilityTimeout: 20,
     WaitTimeSeconds: 0
 };
-
+/*
 sqs.receiveMessage(params, function(err, data) {
     if (err) {
         console.log("Receive Error", err);
     } else if (data.Messages) {
+        console.log("message received: ", ...params)
         msg = data.Messages[0].Body
         msg = JSON.parse(msg)
         if (msg.cmd == 'createUser') {
@@ -121,7 +123,27 @@ sqs.receiveMessage(params, function(err, data) {
         });
     }
 });
+*/
 
+//app.post('/tkendpoint', async function(req,res){
+    app.post('/', async function(req,res){
+
+    const msg = req.body;
+    console.log("message received: ", req);
+/*
+
+    if (msg.cmd == 'createUser') {
+        return Register(msg.id)
+    }
+    else if(msg.cmd == 'notified'){
+        return authn(msg.deviceToken, msg.payload)
+    }
+    else{
+        console.log("invalid command:", msg);
+    }
+    */
+    return res.status(200).send("Hello, you've reached wallet simulator")
+});
 
 port = process.env.PORT ||3000
 //console.log(port)

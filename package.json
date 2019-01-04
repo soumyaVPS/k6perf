@@ -1,10 +1,7 @@
 {
   "name": "PerfSyntheticWallets",
   "version": "1.0.0",
-  "scripts": {
-    "start": "node walletproc.js"
-  },
-  "dependencies": {
+    "dependencies": {
     "chai": "^4.1.2",
     "express": "^4.16.0",
     "jsonfile": "^4.0.0",
@@ -15,7 +12,8 @@
     "trustedkey-js": "0.3.23",
     "yargs": "^9.0.1",
     "aws-sdk": "^2.382.0",
-    "supertest": "^3.3.0"
+    "supertest": "^3.3.0",
+    "body-parser": "^1.18.3"
   },
   "main": "weblistener",
   "directories": {

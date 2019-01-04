@@ -27,7 +27,7 @@ function sendSqsMessage(message)
             console.log(err, err.stack);
         } // an error occurred
         else {
-            console.log('Victory, message sent for ' + encodeURIComponent(request.params.name) + '!');
+            console.log('Victory, message sent  ' + params.MessageBody + '!');
         };
     });
 }
@@ -37,7 +37,7 @@ app.get('/notified',  async function(req, res) {
     return res.status(200).send("auth complete")
 })
 
-app.get('/createUser',  async function(req, res) {
+app.get('/createuser',  async function(req, res) {
     console.log("createUser received :" ,req.query, req.body, req.headers)
     sendSqsMessage("{cmd:\'createUser\', id: \'"+req.query.login+"\'}")
     return res.status(200).send("auth complete")
