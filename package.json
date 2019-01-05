@@ -1,7 +1,10 @@
 {
-  "name": "SyntheticWalletWorker",
+  "name": "PerfSyntheticWallets",
   "version": "1.0.0",
-    "dependencies": {
+  "scripts": {
+    "start": "node walletproc.js"
+  },
+  "dependencies": {
     "chai": "^4.1.2",
     "express": "^4.16.0",
     "jsonfile": "^4.0.0",
@@ -20,5 +23,6 @@
   "directories": {
     "lib": "lib"
   },
+  
   "description": ""
 }
