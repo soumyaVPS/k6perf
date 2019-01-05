@@ -27,20 +27,29 @@ function sendSqsMessage(message)
             console.log(err, err.stack);
         } // an error occurred
         else {
-            console.log('Victory, message sent for ' + encodeURIComponent(request.params.name) + '!');
+            console.log('Victory, message sent  ' + params.MessageBody + '!');
         };
     });
 }
 app.get('/notified',  async function(req, res) {
     console.log("notification received :" ,req.query, req.body, req.headers)
-    sendSqsMessage("{cmd:\'notified\', payload:\'"+ req.body+"\', deviceToken:\'"+ req.query.devicetoken+"\'}")
+    let taskMsg = {
+        cmd:"notified",
+        payload:req.body,
+        deviceToken:req.query.devicetoken
+    }
+    sendSqsMessage(JSON.stringify(taskMsg))
     return res.status(200).send("auth complete")
 })
 
-app.get('/createUser',  async function(req, res) {
+app.get('/createuser',  async function(req, res) {
     console.log("createUser received :" ,req.query, req.body, req.headers)
-    sendSqsMessage("{cmd:\'createUser\', id: \'"+req.query.login+"\'}")
-    return res.status(200).send("auth complete")
+    let taskMsg = {
+        cmd:"createUser",
+        id:req.query.login
+    }
+    sendSqsMessage(JSON.stringify(taskMsg))
+    return res.status(200).send("auth complete " + req.query.login)
 })
 
 app.get('/', async function(req,res){
@@ -51,5 +60,5 @@ port = process.env.PORT ||8090
 //console.log(port)
 app.listen(port, function() {
 
-    //console.log('Example app listening on port 8090!');
+    //console.log("webproc.js app listening on port 8090!');
 });

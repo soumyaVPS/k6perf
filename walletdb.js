@@ -12,35 +12,32 @@ AWS.config.update({
 const storage = module.exports
 
 var docClient = new AWS.DynamoDB.DocumentClient({apiVersion: '2012-08-10'});
-
+const CircularJSON = require('circular-json-es6')
 storage.saveCreds = function (loginName, deviceToken, httpClient)
 {
-    console.log("saveCreds login/token: ", loginName +" " + deviceToken)
-    console.log("address",  httpClient.address)
-    console.log("credentials: ", httpClient.pair)
+    console.log("Saving Creds")
     var params = {
         TableName: Config.walletTable,
         Item: {
-            "loginhint":  loginName,
-            "devicetoken":deviceToken,
-            "address":  httpClient.address,
-            "credentials": httpClient.pair
+            "loginhint":  {S:loginName},
+            "devicetToken":{S:deviceToken},
+            "address":  {S:httpClient.address},
+            "credentials": {S: CircularJSON.stringify(httpClient.pair)}
         }
     };
-
+    console.log("Save creds:" ,params.Item.loginhint, params.Item.devicetToken)
     dbprom = docClient.put(params).promise()
     dbprom.then(function (data){
             console.log("PutItem succeeded for ", loginName," :", data);
-        }).catch(function (err){console.log("Error",error)});
+        }).catch(function (err){console.log("Error",err)});
 
 }
 storage.getCreds = function (deviceToken)
 {
-    console.log("")
-    var params = {
+      var params = {
         TableName: Config.awsWalletTable,
-        Key: {'devicetoken': deviceToken}
+        Key: {'devicetoken': {S:deviceToken}}
     };
-
+    console.log("Get creds:" ,deviceToken)
     return docClient.get(params).promise()
 }

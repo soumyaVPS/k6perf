@@ -14,8 +14,8 @@ module.exports=
   "expiryYears": 10,
 
     "awsRegion":"us-east-2",
-    "awsSQSUrl":'https://sqs.us-east-2.amazonaws.com/348848623230/awseb-e-itfg7gtrbp-stack-AWSEBWorkerQueue-1UM19ILN2FJZC',
-    "AWS_ACCESS_KEY_ID":"AKIAJWDLE4I3S7IT4VAA",
-    "AWS_SECRET_KEY": "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",
-    "awsWalletTable":"walletDynamoTable"
+    "awsSQSUrl":'https://sqs.us-east-2.amazonaws.com/348848623230/awseb-e-i4fykjfmze-stack-AWSEBWorkerQueue-JSDUN99IJ373',
+    "AWS_ACCESS_KEY_ID":"AKIAJGNXRXZ5WBPJZH4Q",
+    "AWS_SECRET_KEY": "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",
+    "walletTable":"awsWalletTable"
 }

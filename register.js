@@ -26,7 +26,11 @@ module.exports = function  register(login_name) {
                 .then(r => {
                     console.log("registered Login at :", Date.now());
                     console.log(r.body);
-                    Storage.saveCreds (login_name, deviceToken, httpClient)
+                    let parsed=JSON.parse(r.body)
+                    if (typeof parsed.body != "undefined") {
+                        console.log("Passed delete me")
+                        Storage.saveCreds(login_name, deviceToken, httpClient)
+                    }
                 })
                 .catch(err => {
                     console.log("caught error", err.message)
