@@ -2,30 +2,28 @@ const Config = require('./config.js');
 const URL = require('url');
 const WalletUtils = require('./lib/WalletUtils');
 const Storage = require('./walletdb')
+module.exports = function authn (deviceToken, payload) {
 
 function completeLogin(signatureRequest, options, nonce, checksum) {
     delete signatureRequest.claims;
     delete signatureRequest.objectIds;
     delete signatureRequest.universalLink;
-
+    const httpClient =  options.httpClient
     // Assemble callback URL for device
     var certs = [];
 
     if (signatureRequest.callbackType === 'post') {
         let url = WalletUtils.buildClaimCallback(
-            options.credential || pair,
+            httpClient.pair, //credentials
             signatureRequest.callbackUrl,
-            // clientId,
             Config.clientId,
             signatureRequest.nonce,
-            //signatureRequest.username,
-            undefined,
+            undefined,  //signatureRequest.username,
             options.accept_login
         );//.replace(/https?:\/\/[^/?]+/, walletUrl)
 
-
         const body = {certs, chain: options.chain};
-        return httpClient.post(URL.parse(url).path, body)
+        return options.httpClient.post(URL.parse(url).path, body)
     } else if (objectIds && options.include_certificate) {
         certs = WalletUtils.matchClaims(Globals.pems, objectIds.split(',')).map(
             claim => (options.noPemHeader ? claim.pem.replace(/-----[ A-Z]+-----|\r?\n/g, '') : claim.pem)
@@ -49,7 +47,44 @@ function completeLogin(signatureRequest, options, nonce, checksum) {
     }
 }
 
-async function authn (deviceToken, payload){
+
+var getPendingRequest = (wallet) =>{
+
+    httpGet('/getPendingRequest',undefined, TK_APP_KEY, TK_APP_SECRET).expect(200)
+        .then( r=>{
+
+            if (r.body.data.result != false ) {
+                sigReq = r.body.data
+                //console.log(timestart ," Got a pending request at :",Date.now())
+                console.log("sigReq : ", sigReq)
+
+                completeLogin(sigReq, {
+                    accept_login: true,
+                    abort_poll: true,
+                    httpClient: httpClient
+                }, sigReq.nonce)
+                    .then(r => {
+                        console.log("completeLogin finished at:" , Date.now())
+                    })
+            }
+        })
+}
+
+    wallet = {}
+
+    Storage.getCreds(deviceToken).then(function (data) {
+            wallet = data.item
+            console.log (wallet)
+            getPendingRequest(wallet)
+        }
+    ).catch(err => {
+        console.log("caught error", err.message)
+    })
+}
+/*
+sign the payload : correct way to do
+
+module.exports = async function authn (deviceToken, payload){
     wallet ={}
     try {
         wallet = await Storage.getCreds(deviceToken)
@@ -63,9 +98,10 @@ async function authn (deviceToken, payload){
     completeLogin(sigReq, {
         accept_login: true,
         abort_poll: true,
-        credential: httpClient.pair
+        httpClient: httpClient
     }, sigReq.nonce)
         .then(r => {
             //console.log("Device responded at :" , Date.now())
         })
 }
+*/

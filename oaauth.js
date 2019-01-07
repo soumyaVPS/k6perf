@@ -28,21 +28,21 @@ export let RateContentOKTK4 = new Rate("tk-submit-login Content OK");
 export let GaugeContentSizeTK4 = new Gauge("tk-submit-login ContentSize");
 export let AuthReqErrorsTK4 = new Counter("tk-submit-login errors");
 
-export let TrendRTTTK5 = new Trend("tk-getPendingRequest RTT");
-export let RateContentOKTK5 = new Rate("tk-getPendingRequest Content OK");
-export let GaugeContentSizeTK5 = new Gauge("tk-getPendingRequest ContentSize");
-export let AuthReqErrorsTK5 = new Counter("tk-getPendingRequest errors");
+export let TrendRTTTK5 = new Trend("tk-wallet-notify RTT");
+export let RateContentOKTK5 = new Rate("tk-wallet-notify Content OK");
+export let GaugeContentSizeTK5 = new Gauge("tk-wallet-notify ContentSize");
+export let AuthReqErrorsTK5 = new Counter("tk-wallet-notify errors");
 
 
-export let TrendRTTTK6 = new Trend("tk-completeLogin RTT");
-export let RateContentOKTK6 = new Rate("tk-completeLogin Content OK");
-export let GaugeContentSizeTK6 = new Gauge("tk-completeLogin ContentSize");
-export let AuthReqErrorsTK6 = new Counter("tk-completeLogin errors");
+export let TrendRTTTK6 = new Trend("tk-waitlogin RTT");
+export let RateContentOKTK6 = new Rate("tk-waitlogin Content OK");
+export let GaugeContentSizeTK6 = new Gauge("tk-waitlogin ContentSize");
+export let AuthReqErrorsTK6 = new Counter("tk-waitlogin errors");
 
-export let TrendRTTTK7 = new Trend("tk-wait-login RTT");
-export let RateContentOKTK7 = new Rate("tk-wait-login Content OK ");
-export let GaugeContentSizeTK7 = new Gauge("tk-wait-login ContentSize");
-export let AuthReqErrorsTK7 = new Counter("tk-wait-login errors");
+export let TrendRTTRP7 = new Trend("tk-rp-callback RTT");
+export let RateContentOKRP7 = new Rate("tk-rp-callback Content OK");
+export let GaugeContentSizeRP7 = new Gauge("tk-rp-callback ContentSize");
+export let AuthReqErrorsRP7 = new Counter("tk-rp-callback errors");
 
 let envLoginPrefix = __ENV.login_prefix;
 
@@ -80,22 +80,11 @@ export default function (uriComponent) {
 
     urlpath = res.headers["Location"]
 
-    for (var p in res.headers) {
-        if (res.headers.hasOwnProperty(p)) {
-            console.log(p + " : " + res.headers[p]);
-        }
-    }
     console.log("\n redirect to :",res.status, ":", urlpath)
     let res2 = http.get(urlpath,
         {headers: {"referer":config.relyingparty},
          redirects: 0})
 
-    console.log("\n wallet  oauth/authorize request\'s response headers: ")
-    for (var p in res2.headers) {
-        if (res2.headers.hasOwnProperty(p)) {
-            console.log(p + " : " + res2.headers[p]);
-        }
-    }
     console.log("\n res2 response body: ",res2.body)
     contentOK = res2.status==302
     TrendRTTTK2.add(res2.timings.duration);
@@ -106,6 +95,8 @@ export default function (uriComponent) {
 
     //oauth redirects to login.html. Shows image and downloads scripts. the scripts invoke submitlogin and waitlogin
     urlpath = config.walletServiceUrl + res2.headers["Location"]
+   // urlpath = res2.headers["Location"] //TODO::which urlpath to chose? httppush has the complete url
+
     console.log("\n", urlpath)
     let res3 = http.get(urlpath,
         {headers: {"referer":config.relyingparty}, redirects: 0}) //TODO:: referer  is not right

@@ -49,7 +49,7 @@ app.get('/createuser',  async function(req, res) {
         id:req.query.login
     }
     sendSqsMessage(JSON.stringify(taskMsg))
-    return res.status(200).send("auth complete " + req.query.login)
+    return res.status(200).send("register complete " + req.query.login)
 })
 
 app.get('/', async function(req,res){

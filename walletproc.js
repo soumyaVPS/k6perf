@@ -18,7 +18,7 @@ app.post('/walletep',  async function(req,res){
         return Register(msg.id)
     }
     else if(msg.cmd == 'notified'){
-        return authn(msg.deviceToken, msg.payload)
+        OAuthn(msg.deviceToken, msg.payload)
     }
     else{
         console.log("invalid command:", msg);

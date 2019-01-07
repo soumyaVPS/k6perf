@@ -14,22 +14,21 @@ function genDevToken() {
     return 'elYWjUdm1O4:APA91bGveIgqwCegLGp1RTdrUYPB1e7BEMHauKi84nLSDw9ie94ckxDOx9cp9mH4ITue-BxE3SFs28hoQGA7i9ynK6DL70e09k9Qe6bLd1icC5FfDN4RHfJy2YYAgbRavQRtZM-' + (Math.random() * 0xFFFFFF).toString(16).substring(2, 6)
 }
 
-module.exports = function  register(login_name) {
-    deviceToken = genDevToken()
-    var httpClient = require('./client')(undefined, Config.clientId, Config.clientSecret)
+module.exports = function  register(loginHint) {
+    const deviceToken = genDevToken()
+    const httpClient = require('./client')(undefined, Config.clientId, Config.clientSecret)
     function httpGet(path, credential, key, secret) {
         return httpClient.get(path, {credential, key, secret})
     }
      var registerLogin = () => {
 
-            httpGet('/registerLogin?login=' + encodeURIComponent(login_name), undefined, Config.clientId, Config.clientSecret)
+            httpGet('/registerLogin?login=' + encodeURIComponent(loginHint), undefined, Config.clientId, Config.clientSecret)
                 .then(r => {
                     console.log("registered Login at :", Date.now());
                     console.log(r.body);
-                    let parsed=JSON.parse(r.body)
-                    if (typeof parsed.body != "undefined") {
-                        console.log("Passed delete me")
-                        Storage.saveCreds(login_name, deviceToken, httpClient)
+                    if ( r.body != undefined && r.body.data != undefined) {
+
+                        Storage.saveCreds(loginHint, deviceToken, httpClient)
                     }
                 })
                 .catch(err => {
