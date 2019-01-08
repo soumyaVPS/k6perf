@@ -9,7 +9,7 @@
     "express": "^4.16.0",
     "jsonfile": "^4.0.0",
     "jsonwebtoken": "^8.2.0",
-    "jsrsasign": "github:enumatech/jsrsasign#add_ski",
+    "jsrsasign": "^8.0.12",
     "k6": "0.0.0",
     "querystring": "^0.2.0",
     "trustedkey-js": "0.3.23",

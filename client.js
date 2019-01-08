@@ -4,7 +4,7 @@ const Utils = require('trustedkey-js/utils')
 const Request = require('supertest')
 const Config = require('./config')
 const App = Config.walletServiceUrl
-
+const Jsrsasign = require("jsrsasign");
 
 /**
  * Create a new HTTP client with `get` and `post` functions
@@ -14,9 +14,10 @@ const App = Config.walletServiceUrl
  * @returns {object} New HTTP client with `get` and `post` functions
  */
 module.exports = function(pair, appKey, appSecret) {
-    pair = pair || Utils.generateKeyPair()
+    curveName=undefined // TODO:: copied Utils.generateKeyPair here because getting jwkey from the key that was gen did not work.
+    pair = pair || Jsrsasign.KEYUTIL.generateKeypair(curveName>0?'RSA':'EC',curveName||'secp256r1').prvKeyObj
     pair.address = Utils.userPubKeyHexToAddress(pair.pubKeyHex)
-
+    console.log("created a httpClient object")
     return {
         pair,
         address: pair.address,

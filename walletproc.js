@@ -12,7 +12,7 @@ app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 app.post('/walletep',  async function(req,res){
 
     const msg = req.body;
-    console.log("message received: ", msg);
+    console.log("message received: ", Date.now(), msg);
 
     if (msg.cmd == 'createUser') {
         return Register(msg.id)

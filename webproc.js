@@ -1,5 +1,9 @@
 var express = require('express');
 var app = express();
+var bodyParser = require('body-parser');
+app.use(bodyParser.json()); // support json encoded bodies
+app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
+
 sqs = {}
 var AWS = require('aws-sdk')
 const Config = require('./config.js');
@@ -31,8 +35,9 @@ function sendSqsMessage(message)
         };
     });
 }
-app.get('/notified',  async function(req, res) {
-    console.log("notification received :" ,req.query, req.body, req.headers)
+
+app.all('/notified',  async function(req, res) {
+    console.log("notification received :", Date.now(),req.query, req.body, req.headers)
     let taskMsg = {
         cmd:"notified",
         payload:req.body,
@@ -42,8 +47,9 @@ app.get('/notified',  async function(req, res) {
     return res.status(200).send("auth complete")
 })
 
+
 app.get('/createuser',  async function(req, res) {
-    console.log("createUser received :" ,req.query, req.body, req.headers)
+    console.log("createUser received :",Date.now() ,req.query, req.body, req.headers)
     let taskMsg = {
         cmd:"createUser",
         id:req.query.login

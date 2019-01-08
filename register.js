@@ -1,4 +1,4 @@
-
+const Jsrsasign = require("jsrsasign");
 const Utils = require('trustedkey-js/utils')
 const JWT = require('jsonwebtoken')
 const Chai = require('chai')
@@ -20,6 +20,7 @@ module.exports = function  register(loginHint) {
     function httpGet(path, credential, key, secret) {
         return httpClient.get(path, {credential, key, secret})
     }
+
      var registerLogin = () => {
 
             httpGet('/registerLogin?login=' + encodeURIComponent(loginHint), undefined, Config.clientId, Config.clientSecret)
@@ -27,8 +28,8 @@ module.exports = function  register(loginHint) {
                     console.log("registered Login at :", Date.now());
                     console.log(r.body);
                     if ( r.body != undefined && r.body.data != undefined) {
-
-                        Storage.saveCreds(loginHint, deviceToken, httpClient)
+                        var creds =Jsrsasign.KEYUTIL.getJWKFromKey(httpClient.pair)
+                        Storage.saveCreds(loginHint, deviceToken, httpClient.address, creds)
                     }
                 })
                 .catch(err => {

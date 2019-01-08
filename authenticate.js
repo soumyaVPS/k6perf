@@ -2,80 +2,83 @@ const Config = require('./config.js');
 const URL = require('url');
 const WalletUtils = require('./lib/WalletUtils');
 const Storage = require('./walletdb')
-module.exports = function authn (deviceToken, payload) {
+const CircularJSON = require('circular-json-es6')
+const Jsrsasign = require("jsrsasign");
 
-function completeLogin(signatureRequest, options, nonce, checksum) {
-    delete signatureRequest.claims;
-    delete signatureRequest.objectIds;
-    delete signatureRequest.universalLink;
-    const httpClient =  options.httpClient
-    // Assemble callback URL for device
-    var certs = [];
-
-    if (signatureRequest.callbackType === 'post') {
-        let url = WalletUtils.buildClaimCallback(
-            httpClient.pair, //credentials
-            signatureRequest.callbackUrl,
-            Config.clientId,
-            signatureRequest.nonce,
-            undefined,  //signatureRequest.username,
-            options.accept_login
-        );//.replace(/https?:\/\/[^/?]+/, walletUrl)
-
-        const body = {certs, chain: options.chain};
-        return options.httpClient.post(URL.parse(url).path, body)
-    } else if (objectIds && options.include_certificate) {
-        certs = WalletUtils.matchClaims(Globals.pems, objectIds.split(',')).map(
-            claim => (options.noPemHeader ? claim.pem.replace(/-----[ A-Z]+-----|\r?\n/g, '') : claim.pem)
-        )
+module.exports = function authn(deviceToken, payload) {
+    var httpClient = {}
+    function httpGet(path, credential, key, secret) {
+        return httpClient.get(path, {credential, key, secret})
     }
 
-    if (signatureRequest.callbackType === 'json') {
-        let url = WalletUtils.buildClaimCallback(
-            options.credential || pair,
-            signatureRequest.callbackUrl,
-            Config.clientId,
-            signatureRequest.nonce,
-            options.username_response,
-            options.accept_login ? certs : null,
-            options.chain
-        );
+    function completeLogin(signatureRequest, options, nonce, checksum) {
+        delete signatureRequest.claims;
+        delete signatureRequest.objectIds;
+        delete signatureRequest.universalLink;
+        // Assemble callback URL for device
+        var certs = [];
 
-        return httpClient.get(URL.parse(url).path, options)
-    } else {
-        Assert.fail('Unsupported callbackType: ' + signatureRequest.callbackType)
+        if (signatureRequest.callbackType === 'post') {
+            let url = WalletUtils.buildClaimCallback(
+                httpClient.pair, //credentials
+                signatureRequest.callbackUrl,
+                Config.clientId,
+                signatureRequest.nonce,
+                undefined,  //signatureRequest.username,
+                options.accept_login
+            );//.replace(/https?:\/\/[^/?]+/, walletUrl)
+
+            const body = {certs, chain: options.chain};
+            return httpClient.post(URL.parse(url).path, body)
+        }
+
+       /* if (signatureRequest.callbackType === 'json') {
+            let url = WalletUtils.buildClaimCallback(
+                options.credential || pair,
+                signatureRequest.callbackUrl,
+                Config.clientId,
+                signatureRequest.nonce,
+                options.username_response,
+                options.accept_login ? certs : null,
+                options.chain
+            );
+
+            return httpClient.get(URL.parse(url).path, options)
+        }*/ else {
+            Assert.fail('Unsupported callbackType: ' + signatureRequest.callbackType)
+        }
     }
-}
 
 
-var getPendingRequest = (wallet) =>{
+    var getPendingRequest = () => {
 
-    httpGet('/getPendingRequest',undefined, TK_APP_KEY, TK_APP_SECRET).expect(200)
-        .then( r=>{
+        httpGet('/getPendingRequest', undefined, Config.clientId, Config.clientSecret).expect(200)
+            .then(r => {
+                console.log("getPendingRequest returned:", r.body)
+                if (r.body.data.result != false) {
+                    sigReq = r.body.data
+                    //console.log(timestart ," Got a pending request at :",Date.now())
+                    console.log("sigReq : ", sigReq)
 
-            if (r.body.data.result != false ) {
-                sigReq = r.body.data
-                //console.log(timestart ," Got a pending request at :",Date.now())
-                console.log("sigReq : ", sigReq)
+                    completeLogin(sigReq, {
+                        accept_login: true,
+                        abort_poll: true,
+                    }, sigReq.nonce)
+                        .then(r => {
+                            console.log("completeLogin finished at:", Date.now())
+                        })
+                }
+            })
+    }
 
-                completeLogin(sigReq, {
-                    accept_login: true,
-                    abort_poll: true,
-                    httpClient: httpClient
-                }, sigReq.nonce)
-                    .then(r => {
-                        console.log("completeLogin finished at:" , Date.now())
-                    })
-            }
-        })
-}
-
-    wallet = {}
 
     Storage.getCreds(deviceToken).then(function (data) {
-            wallet = data.item
-            console.log (wallet)
-            getPendingRequest(wallet)
+            wallet = data.Item
+            console.log("Retrieved Wallet from db: " ,wallet)
+            const keyObj = Jsrsasign.KEYUTIL.getKey(wallet.credentials)
+            console.log("Key Obj ", keyObj)
+            httpClient = require('./client')(keyObj, Config.clientId, Config.clientSecret)
+            getPendingRequest()
         }
     ).catch(err => {
         console.log("caught error", err.message)

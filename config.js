@@ -1,5 +1,5 @@
 module.exports=
-{ "relyingparty": "https://soumya-rp-ip-stg-example.herokuapp.com/login",
+{ "relyingparty": "https://perf-tk-rp.herokuapp.com/login",
     "login_hint":"soumya.aithal@trustedkey.com",
     "walletServiceUrl": "https://wallet-stg.trustedkey.com",
     //"submitloginuri": `/oauth/IDentify/submitLogin?query=queryParam&username=usernameParam`,
