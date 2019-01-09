@@ -63,9 +63,10 @@ export default function (uriComponent) {
 
     var vu_id=`${__VU}`
 
+
     //console.log("****************************"+ env_login_prefix)
     var username = envLoginPrefix+vu_id
-    username = "soumya.aithal@trustedkey.com"
+    username = "tree123666"
 
     let urlpath =config.relyingparty+"?login_hint="+username
     let res = http.get(urlpath, {redirects:0}) ;
@@ -80,9 +81,10 @@ export default function (uriComponent) {
 
     urlpath = res.headers["Location"]
 
-    console.log("\n redirect to :",res.status, ":", urlpath)
+    //console.log("\n redirect to :",res.status, ":", urlpath)
     let res2 = http.get(urlpath,
-        {headers: {"referer":config.relyingparty},
+        {tags: {name: config.relyingparty},
+        headers: {"referer":config.relyingparty},
          redirects: 0})
 
     console.log("\n res2 response body: ",res2.body)
@@ -94,13 +96,16 @@ export default function (uriComponent) {
 
 
     //oauth redirects to login.html. Shows image and downloads scripts. the scripts invoke submitlogin and waitlogin
-    urlpath = config.walletServiceUrl + res2.headers["Location"]
-   // urlpath = res2.headers["Location"] //TODO::which urlpath to chose? httppush has the complete url
+    //urlpath = config.walletServiceUrl + res2.headers["Location"]
 
-    console.log("\n", urlpath)
-    let res3 = http.get(urlpath,
-        {headers: {"referer":config.relyingparty}, redirects: 0}) //TODO:: referer  is not right
-    console.log("res3 response:", res3.headers, res3.status, res3.body)
+   var loginurl = res2.headers["Location"] //TODO::which urlpath to chose? http push has the complete url
+
+    //console.log("\n", loginurl)
+    let res3 = http.get(loginurl,
+        {   tags:urlpath.substring(0,urlpath.indexOf('?')),
+            headers: {"referer":config.relyingparty},
+            redirects: 0}) //TODO:: referer  is not right
+    //console.log("res3 response:", res3.headers, res3.status,res3.body)
 
 
     contentOK = res3.status==200
@@ -113,16 +118,20 @@ export default function (uriComponent) {
     let loc = res2.headers["Location"]
     let queryParam = loc.substring(loc.indexOf('?')).substring(1)
 
-    ////console.log(queryParam)
     let usernameParam = parseParam(queryParam, "login_hint")
     let guidparam = parseParam(queryParam,"guid")
     //console.log(usernameParam, guidparam)
 
-
     urlpath = config.walletServiceUrl + config.submitloginuri + "?"+"guid="+guidparam +"&username="+usernameParam
     //console.log(urlpath)
 
-    let res4 = http.get(urlpath, {cache: 'no-cache'})
+    let res4 = http.post(urlpath, {}
+    ,{
+        tags: config.walletServiceUrl+config.submitloginuri,
+        headers: {"referer":loginurl,
+
+        cache: 'no-cache',
+            'x-requested-with': 'XmlHttpRequest'}})
     //console.log("submitlogin response:", res4.headers, res4.status, res4.body)
 
     contentOK = res4.status == 200
@@ -140,21 +149,23 @@ export default function (uriComponent) {
 
         urlpath = config.walletServiceUrl + config.waitloginuri.replace('guidparam', guidparam)
 
-        let res5 = http.get(urlpath, {cache: 'no-cache'})
+        let res5 = http.post(urlpath,{}
+            ,{ tags:config.walletServiceUrl+config.waitloginuri,
+                headers:{"referer":loginurl,cache: 'no-cache','x-requested-with': 'XmlHttpRequest'}})
 
 
         contentOK = res5.status == 200
 
         //console.log(res5.status, res5.body, res5.headers)
-        TrendRTTTK7.add(res5.timings.duration);
-        RateContentOKTK7.add(contentOK);
-        GaugeContentSizeTK7.add(res5.body.length);
-        AuthReqErrorsTK7.add(!contentOK);
+        TrendRTTTK5.add(res5.timings.duration);
+        RateContentOKTK5.add(contentOK);
+        GaugeContentSizeTK5.add(res5.body.length);
+        AuthReqErrorsTK5.add(!contentOK);
 
-
+break;
         //redirect back to heroku oauth
         //let json = res5.body
-        //console.log(json)
+        ////console.log(json)
     }
 
 
