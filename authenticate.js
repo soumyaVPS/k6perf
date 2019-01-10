@@ -72,7 +72,7 @@ module.exports = function authn(deviceToken, payload) {
     }
 
 
-    Storage.getCreds(deviceToken).then(function (data) {
+    /*Storage.getCreds(deviceToken).then(function (data) {
             wallet = data.Item
             console.log("Retrieved Wallet from db: " ,wallet)
             const keyObj = Jsrsasign.KEYUTIL.getKey(wallet.credentials)
@@ -82,29 +82,52 @@ module.exports = function authn(deviceToken, payload) {
         }
     ).catch(err => {
         console.log("caught error", err.message)
+    })*/
+
+    Storage.getCreds(deviceToken).then(function (data) {
+            const wallet = data.Item
+            console.log("Retrieved Wallet from db: " ,wallet)
+            const keyObj = Jsrsasign.KEYUTIL.getKey(wallet.credentials)
+            console.log("Key Obj ", keyObj)
+            httpClient = require('./client')(keyObj, Config.clientId, Config.clientSecret)
+
+            const sigReq=payload
+        console.log(Date.now(), "sigReq : ", sigReq)
+
+        completeLogin(sigReq, {
+                accept_login: true,
+                abort_poll: true,
+            }, sigReq.nonce).then(r => {
+                console.log(Date.now(), "completeLogin finished at:", Date.now())
+            })
+        }
+    ).catch(err => {
+        console.log("caught error", err.message)
     })
 }
 /*
 sign the payload : correct way to do
 
-module.exports = async function authn (deviceToken, payload){
-    wallet ={}
-    try {
-        wallet = await Storage.getCreds(deviceToken)
-    }
-    catch (error)
-    {
-        console.log("Error getting Creds for :",deviceToken)
-    }
-    const httpClient = require('./client')(wallet.credentials, Config.clientId, Config.clientSecret);
-    sigReq=payload
-    completeLogin(sigReq, {
-        accept_login: true,
-        abort_poll: true,
-        httpClient: httpClient
-    }, sigReq.nonce)
-        .then(r => {
-            //console.log("Device responded at :" , Date.now())
-        })
+module.exports = async function authn1 (deviceToken, payload){
+    Storage.getCreds(deviceToken).then(function (data) {
+            const wallet = data.Item
+            console.log("Retrieved Wallet from db: " ,wallet)
+            const keyObj = Jsrsasign.KEYUTIL.getKey(wallet.credentials)
+            console.log("Key Obj ", keyObj)
+
+            const sigReq=payload
+            completeLogin(sigReq, {
+                        accept_login: true,
+                        abort_poll: true,
+                    }, sigReq.nonce).then(r => {
+                            console.log("completeLogin finished at:", Date.now())
+                        })
+        }
+    ).catch(err => {
+        console.log("caught error", err.message)
+    })
+
+
 }
+
 */

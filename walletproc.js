@@ -15,7 +15,7 @@ app.post('/walletep',  async function(req,res){
     console.log("message received: ", Date.now(), msg);
 
     if (msg.cmd == 'createUser') {
-        return Register(msg.id)
+        Register(msg.id) //TODO:: Check result?
     }
     else if(msg.cmd == 'notified'){
         OAuthn(msg.deviceToken, msg.payload)

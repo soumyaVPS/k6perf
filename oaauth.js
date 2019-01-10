@@ -27,23 +27,23 @@ export let TrendRTTTK4 = new Trend("tk-submit-login RTT");
 export let RateContentOKTK4 = new Rate("tk-submit-login Content OK");
 export let GaugeContentSizeTK4 = new Gauge("tk-submit-login ContentSize");
 export let AuthReqErrorsTK4 = new Counter("tk-submit-login errors");
-
+/*
 export let TrendRTTTK5 = new Trend("tk-wallet-notify RTT");
 export let RateContentOKTK5 = new Rate("tk-wallet-notify Content OK");
 export let GaugeContentSizeTK5 = new Gauge("tk-wallet-notify ContentSize");
 export let AuthReqErrorsTK5 = new Counter("tk-wallet-notify errors");
+*/
 
-
-export let TrendRTTTK6 = new Trend("tk-waitlogin RTT");
-export let RateContentOKTK6 = new Rate("tk-waitlogin Content OK");
-export let GaugeContentSizeTK6 = new Gauge("tk-waitlogin ContentSize");
-export let AuthReqErrorsTK6 = new Counter("tk-waitlogin errors");
-
+export let TrendRTTTK5 = new Trend("tk-waitlogin RTT");
+export let RateContentOKTK5 = new Rate("tk-waitlogin Content OK");
+export let GaugeContentSizeTK5 = new Gauge("tk-waitlogin ContentSize");
+export let AuthReqErrorsTK5 = new Counter("tk-waitlogin errors");
+/*
 export let TrendRTTRP7 = new Trend("tk-rp-callback RTT");
 export let RateContentOKRP7 = new Rate("tk-rp-callback Content OK");
 export let GaugeContentSizeRP7 = new Gauge("tk-rp-callback ContentSize");
 export let AuthReqErrorsRP7 = new Counter("tk-rp-callback errors");
-
+*/
 let envLoginPrefix = __ENV.login_prefix;
 
 
@@ -66,10 +66,12 @@ export default function (uriComponent) {
 
     //console.log("****************************"+ env_login_prefix)
     var username = envLoginPrefix+vu_id
-    username = "tree123666"
+    //username = "tree123666"
 
     let urlpath =config.relyingparty+"?login_hint="+username
-    let res = http.get(urlpath, {redirects:0}) ;
+    let res = http.get(urlpath, {
+        tags:{"urltype":"RP login"},
+        redirects:0}) ;
 
     let contentOK = res.status==302
     TrendRTTRP1.add(res.timings.duration);
@@ -83,11 +85,12 @@ export default function (uriComponent) {
 
     //console.log("\n redirect to :",res.status, ":", urlpath)
     let res2 = http.get(urlpath,
-        {tags: {name: config.relyingparty},
+        {
+            tags:{"urltype":"Oauth/Authorize"},
         headers: {"referer":config.relyingparty},
          redirects: 0})
 
-    console.log("\n res2 response body: ",res2.body)
+    //console.log("\n res2 response body: ",res2.body)
     contentOK = res2.status==302
     TrendRTTTK2.add(res2.timings.duration);
     RateContentOKTK2.add(contentOK);
@@ -102,7 +105,7 @@ export default function (uriComponent) {
 
     //console.log("\n", loginurl)
     let res3 = http.get(loginurl,
-        {   tags:urlpath.substring(0,urlpath.indexOf('?')),
+        {   tags:{"urltype":"loginurl"},
             headers: {"referer":config.relyingparty},
             redirects: 0}) //TODO:: referer  is not right
     //console.log("res3 response:", res3.headers, res3.status,res3.body)
@@ -127,7 +130,7 @@ export default function (uriComponent) {
 
     let res4 = http.post(urlpath, {}
     ,{
-        tags: config.walletServiceUrl+config.submitloginuri,
+        tags:{"urltype":"submitlogin"},
         headers: {"referer":loginurl,
 
         cache: 'no-cache',
@@ -150,7 +153,7 @@ export default function (uriComponent) {
         urlpath = config.walletServiceUrl + config.waitloginuri.replace('guidparam', guidparam)
 
         let res5 = http.post(urlpath,{}
-            ,{ tags:config.walletServiceUrl+config.waitloginuri,
+            ,{ tags:{"urltype":"waitlogin"},
                 headers:{"referer":loginurl,cache: 'no-cache','x-requested-with': 'XmlHttpRequest'}})
 
 
