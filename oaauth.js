@@ -59,18 +59,27 @@ function parseParam(query, qp)
     return undefined
 }
 
+export let TrendRTTRP0 = new Trend("dummy RTT");
+export let RateContentOKRPP0 = new Rate("dummy Content OK");
+export let GaugeContentSizeRPP0 = new Gauge("dummy ContentSize");
+export let AuthReqErrorsRPP0 = new Counter("dummy errors");
+
 export default function (uriComponent) {
+
+
+
 
     var vu_id=`${__VU}`
 
 
-    //console.log("****************************"+ env_login_prefix)
+    ////console.log("****************************"+ env_login_prefix)
     var username = envLoginPrefix+vu_id
     //username = "tree123666"
 
     let urlpath =config.relyingparty+"?login_hint="+username
+    //console.log("RP path", urlpath)
     let res = http.get(urlpath, {
-        tags:{"urltype":"RP login"},
+        tags:{name:"RP login"},
         redirects:0}) ;
 
     let contentOK = res.status==302
@@ -86,7 +95,7 @@ export default function (uriComponent) {
     //console.log("\n redirect to :",res.status, ":", urlpath)
     let res2 = http.get(urlpath,
         {
-            tags:{"urltype":"Oauth/Authorize"},
+            tags:{name:"Oauth/Authorize"},
         headers: {"referer":config.relyingparty},
          redirects: 0})
 
@@ -103,12 +112,12 @@ export default function (uriComponent) {
 
    var loginurl = res2.headers["Location"] //TODO::which urlpath to chose? http push has the complete url
 
-    //console.log("\n", loginurl)
+    //console.log("Calling All logging urls: \n", loginurl)
     let res3 = http.get(loginurl,
-        {   tags:{"urltype":"loginurl"},
+        {   tags:{name:"loginurl"},
             headers: {"referer":config.relyingparty},
             redirects: 0}) //TODO:: referer  is not right
-    //console.log("res3 response:", res3.headers, res3.status,res3.body)
+    ////console.log("res3 response:", res3.headers, res3.status,res3.body)
 
 
     contentOK = res3.status==200
@@ -123,19 +132,19 @@ export default function (uriComponent) {
 
     let usernameParam = parseParam(queryParam, "login_hint")
     let guidparam = parseParam(queryParam,"guid")
-    //console.log(usernameParam, guidparam)
+    ////console.log(usernameParam, guidparam)
 
     urlpath = config.walletServiceUrl + config.submitloginuri + "?"+"guid="+guidparam +"&username="+usernameParam
-    //console.log(urlpath)
+    ////console.log(urlpath)
 
     let res4 = http.post(urlpath, {}
     ,{
-        tags:{"urltype":"submitlogin"},
+        tags:{name:"submitlogin"},
         headers: {"referer":loginurl,
 
         cache: 'no-cache',
             'x-requested-with': 'XmlHttpRequest'}})
-    //console.log("submitlogin response:", res4.headers, res4.status, res4.body)
+    ////console.log("submitlogin response:", res4.headers, res4.status, res4.body)
 
     contentOK = res4.status == 200
     TrendRTTTK4.add(res4.timings.duration);
@@ -144,32 +153,46 @@ export default function (uriComponent) {
     AuthReqErrorsTK4.add(!contentOK);
 
     let jsonResp =res4.body
-    //console.log(res4.headers, "\n", jsonResp)
+    ////console.log(res4.headers, "\n", jsonResp)
 
     //waitlogin
+    /*
     contentOK = false
+    let duration =0
+    let count = 0
     while (!contentOK) {
 
+        count +=1
         urlpath = config.walletServiceUrl + config.waitloginuri.replace('guidparam', guidparam)
 
-        let res5 = http.post(urlpath,{}
-            ,{ tags:{"urltype":"waitlogin"},
+        var res5 = http.post(urlpath,{}
+            ,{ tags:{name:"waitlogin"},
                 headers:{"referer":loginurl,cache: 'no-cache','x-requested-with': 'XmlHttpRequest'}})
 
 
         contentOK = res5.status == 200
 
-        //console.log(res5.status, res5.body, res5.headers)
-        TrendRTTTK5.add(res5.timings.duration);
+        //redirect back to heroku oauth
+        //let json = res5.body
+        //////console.log(json)
+        duration += res5.timings.duration
+        TrendRTTTK5.add();
         RateContentOKTK5.add(contentOK);
         GaugeContentSizeTK5.add(res5.body.length);
         AuthReqErrorsTK5.add(!contentOK);
+        ////console.log(res5.status, res5.body, res5.headers)
 
-break;
-        //redirect back to heroku oauth
-        //let json = res5.body
-        ////console.log(json)
     }
+*/
 
+
+/*
+    let res0 = http.get("http://www.google.com", {redirects:0}) ;
+
+    contentOK = res0.status==302
+    TrendRTTRP0.add(res0.timings.duration);
+    RateContentOKRPP0.add(contentOK);
+    GaugeContentSizeRPP0.add(res0.body.length);
+    AuthReqErrorsRPP0.add(!contentOK);*/
 
 };
