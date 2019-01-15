@@ -38,6 +38,7 @@ module.exports = function(pair, appKey, appSecret) {
                 .set('Accept', json ? 'application/json' : 'text/plain')
                 .set('Content-Type', 'application/json')
             let authzheader = WalletUtils.getAuthorizationHeader(req.url, credential, body, key, secret)
+            console.log("Sending confirmlogin to ", req.url, " ", path)
             return req
                 .set('Authorization', authzheader)
                 .send(body)

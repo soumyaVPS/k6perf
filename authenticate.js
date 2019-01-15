@@ -5,7 +5,29 @@ const Storage = require('./walletdb')
 const CircularJSON = require('circular-json-es6')
 const Jsrsasign = require("jsrsasign");
 
-module.exports = function authn(deviceToken, payload) {
+var AWS = require('aws-sdk');
+
+function sendSqsMessage(message)
+{
+    sqs = new AWS.SQS();
+
+    var params = {
+        MessageBody: message,
+        QueueUrl: Config.responseTimeLogQueue,
+        DelaySeconds: 0
+    };
+
+    sqs.sendMessage(params, function (err, data) {
+        if (err) {
+            console.log(err, err.stack);
+        } // an error occurred
+        else {
+            console.log('Victory, message sent  ' + params.MessageBody + '!');
+        }
+    });
+}
+//module.exports=Oauthn
+module.exports = function authn (deviceToken, payload) {
     var httpClient = {}
     function httpGet(path, credential, key, secret) {
         return httpClient.get(path, {credential, key, secret})
@@ -31,25 +53,12 @@ module.exports = function authn(deviceToken, payload) {
             const body = {certs, chain: options.chain};
             return httpClient.post(URL.parse(url).path, body)
         }
-
-       /* if (signatureRequest.callbackType === 'json') {
-            let url = WalletUtils.buildClaimCallback(
-                options.credential || pair,
-                signatureRequest.callbackUrl,
-                Config.clientId,
-                signatureRequest.nonce,
-                options.username_response,
-                options.accept_login ? certs : null,
-                options.chain
-            );
-
-            return httpClient.get(URL.parse(url).path, options)
-        }*/ else {
+         else {
             Assert.fail('Unsupported callbackType: ' + signatureRequest.callbackType)
         }
     }
 
-
+/*
     var getPendingRequest = () => {
 
         httpGet('/getPendingRequest', undefined, Config.clientId, Config.clientSecret).expect(200)
@@ -65,50 +74,48 @@ module.exports = function authn(deviceToken, payload) {
                         abort_poll: true,
                     }, sigReq.nonce)
                         .then(r => {
-                            console.log("completeLogin finished at:", Date.now())
+                            recordTime.loginCompleted = Date.now()
+                            recordTime.cmd = "log"
+                            recordTime.guid = sigReq.nonce  //TODO::guid or nonce
+                            sendSqsMessage(JSON.stringify(recordTime))
                         })
                 }
             })
     }
-
-
-    /*Storage.getCreds(deviceToken).then(function (data) {
-            wallet = data.Item
-            console.log("Retrieved Wallet from db: " ,wallet)
-            const keyObj = Jsrsasign.KEYUTIL.getKey(wallet.credentials)
-            console.log("Key Obj ", keyObj)
-            httpClient = require('./client')(keyObj, Config.clientId, Config.clientSecret)
-            getPendingRequest()
-        }
-    ).catch(err => {
-        console.log("caught error", err.message)
-    })*/
+*/
+    let recordTime = {}
+    recordTime.notificationArrived = Date.now()
 
     Storage.getCreds(deviceToken).then(function (data) {
             const wallet = data.Item
-            console.log("Retrieved Wallet from db: " ,wallet)
+            //console.log("Retrieved Wallet from db: " ,wallet)
             const keyObj = Jsrsasign.KEYUTIL.getKey(wallet.credentials)
-            console.log("Key Obj ", keyObj)
+            //console.log("Key Obj ", keyObj)
             httpClient = require('./client')(keyObj, Config.clientId, Config.clientSecret)
 
             const sigReq=payload
-        console.log(Date.now(), "sigReq : ", sigReq)
+        recordTime.dbResponded = Date.now()
+        console.log("Signing signature request for sigReq : ", sigReq)
 
         completeLogin(sigReq, {
                 accept_login: true,
                 abort_poll: true,
             }, sigReq.nonce).then(r => {
-                console.log(Date.now(), "completeLogin finished at:", Date.now())
+                console.log( "completeLogin finished for:",wallet.loginhint)
+                recordTime.loginCompleted = Date.now()
+                recordTime.cmd = "log"
+                recordTime.guid = sigReq.nonce  //TODO::guid or nonce
+                sendSqsMessage(JSON.stringify(recordTime))
             })
         }
     ).catch(err => {
         console.log("caught error", err.message)
     })
 }
-/*
-sign the payload : correct way to do
 
-module.exports = async function authn1 (deviceToken, payload){
+//sign the payload : correct way to do
+/*
+Oauthn.getPendingRequest = async function (deviceToken, payload){
     Storage.getCreds(deviceToken).then(function (data) {
             const wallet = data.Item
             console.log("Retrieved Wallet from db: " ,wallet)
@@ -116,6 +123,7 @@ module.exports = async function authn1 (deviceToken, payload){
             console.log("Key Obj ", keyObj)
 
             const sigReq=payload
+
             completeLogin(sigReq, {
                         accept_login: true,
                         abort_poll: true,
@@ -127,7 +135,5 @@ module.exports = async function authn1 (deviceToken, payload){
         console.log("caught error", err.message)
     })
 
-
 }
-
 */

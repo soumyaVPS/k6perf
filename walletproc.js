@@ -20,6 +20,10 @@ app.post('/walletep',  async function(req,res){
     else if(msg.cmd == 'notified'){
         OAuthn(msg.deviceToken, msg.payload)
     }
+    else if (msg.cmd == 'getPendingRequest')
+    {
+
+    }
     else{
         console.log("invalid command:", msg);
     }

@@ -12,7 +12,6 @@ AWS.config.update({
 const storage = module.exports
 
 var docClient = new AWS.DynamoDB.DocumentClient({apiVersion: '2012-08-10'});
-const CircularJSON = require('circular-json-es6')
 storage.saveCreds = function (loginName, deviceToken,address, keypair)
 {
     console.log("Saving Creds")

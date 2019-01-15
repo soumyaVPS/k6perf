@@ -32,7 +32,7 @@ function sendSqsMessage(message)
         } // an error occurred
         else {
             console.log('Victory, message sent  ' + params.MessageBody + '!');
-        };
+        }
     });
 }
 
