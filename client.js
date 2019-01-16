@@ -17,7 +17,7 @@ module.exports = function(pair, appKey, appSecret) {
     curveName=undefined // TODO:: copied Utils.generateKeyPair here because getting jwkey from the key that was gen did not work.
     pair = pair || Jsrsasign.KEYUTIL.generateKeypair(curveName>0?'RSA':'EC',curveName||'secp256r1').prvKeyObj
     pair.address = Utils.userPubKeyHexToAddress(pair.pubKeyHex)
-    console.log("created a httpClient object")
+    //console.log("created a httpClient object")
     return {
         pair,
         address: pair.address,
@@ -38,7 +38,7 @@ module.exports = function(pair, appKey, appSecret) {
                 .set('Accept', json ? 'application/json' : 'text/plain')
                 .set('Content-Type', 'application/json')
             let authzheader = WalletUtils.getAuthorizationHeader(req.url, credential, body, key, secret)
-            console.log("Sending confirmlogin to ", req.url, " ", path)
+            //console.log("Sending confirmlogin to ", req.url, " ", path)
             return req
                 .set('Authorization', authzheader)
                 .send(body)

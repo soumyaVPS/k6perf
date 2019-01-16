@@ -27,11 +27,12 @@ app.post('/logger',  async function(req,res){
             'Item': {
 
                 'guid':msg.guid,
-                'notificationArrived':  Date(msg.notificationArrived).toLocaleString(),
-                'dbResponded': Date(msg.dbResponded).toLocaleString(),
-                'loginCompleted': Date(msg.loginCompleted).toLocaleString(),
-                'Totalduration': parseInt(msg.loginCompleted) - parseInt(msg.notificationArrived),
-                'dbResponseDuration' : parseInt(msg.dbResponded) - parseInt(msg.notificationArrived)
+                'httpNotifiedAt':msg.httpNotifiedAt,
+                'notificationArrived':  msg.notificationArrived,
+                'dbResponded': msg.dbResponded,
+                'loginCompleted': msg.loginCompleted,
+                'Totalduration':  parseInt(msg.loginCompleted) - parseInt(msg.httpNotifiedAt),
+                'dbResponseTime' : parseInt(msg.dbResponded) - parseInt(msg.notificationArrived),
             }
         };
 

@@ -21,5 +21,7 @@ let recordTime = {}
 recordTime.notificationArrived = Date.now()
 recordTime.dbResponded = Date.now()
 a = JSON.stringify(recordTime)
-console.log(a ,a.dbResponded.toLocaleString())
+//console.log(a ,a.dbResponded.toLocaleString())
+console.log(new Date(parseInt("1547594545839")).toLocaleString())
+console.log(new Date(1547594618643).toLocaleString())
 

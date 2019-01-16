@@ -14,7 +14,8 @@ module.exports=
   "expiryYears": 10,
 
     "awsRegion":"us-east-2",
-    "awsSQSUrl":'https://sqs.us-east-2.amazonaws.com/279674402355/awseb-e-mpmi7qejgh-stack-AWSEBWorkerQueue-59ZLHWM1XLIY',
+    "awsSQSUrl":'https://sqs.us-east-2.amazonaws.com/279674402355/awseb-e-mpmi7qejgh-stack-AWSEBWorkerQueue-1WBCMC2B6CZOU',
+    //"awsSQSUrl": "https://sqs.us-east-2.amazonaws.com/279674402355/notifiQ.fifo",
     "responseTimeLogQueue" : "https://sqs.us-east-2.amazonaws.com/279674402355/awseb-e-q9mqwdmqkr-stack-AWSEBWorkerQueue-IW3CN8MSOBBB",
     "walletTable":"awsWalletTable",
     "responseTimeTable":"ResponseTimes"

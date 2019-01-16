@@ -14,7 +14,7 @@ const storage = module.exports
 var docClient = new AWS.DynamoDB.DocumentClient({apiVersion: '2012-08-10'});
 storage.saveCreds = function (loginName, deviceToken,address, keypair)
 {
-    console.log("Saving Creds")
+    //console.log("Saving Creds")
     var params = {
         'TableName': Config.walletTable,
         'Item': {
@@ -23,9 +23,10 @@ storage.saveCreds = function (loginName, deviceToken,address, keypair)
             'loginhint':  loginName,
             'address':  address,
             'credentials': keypair
+
         }
     };
-    console.log("Save creds:" ,params.Item.loginhint, params.Item.deviceToken)
+   // console.log("Save creds:" ,params.Item.loginhint, params.Item.deviceToken)
     dbprom = docClient.put(params).promise()
     dbprom.then(function (data){
             console.log("PutItem succeeded for ", loginName," :", data);
@@ -39,6 +40,6 @@ storage.getCreds = function (deviceToken)
           'TableName': Config.walletTable,
           'Key': {'deviceToken':deviceToken}
     };
-    console.log("Get creds:" ,deviceToken)
+    //console.log("Get creds:" ,deviceToken)
     return docClient.get(params).promise()
 }

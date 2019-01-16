@@ -2,6 +2,7 @@ const Register = require ('./register')
 const OAuthn = require ('./authenticate')
 const Chai = require('chai');
 Assert = Chai.assert
+
 const express = require('express');
 const app = express();
 var bodyParser = require('body-parser');
@@ -12,13 +13,13 @@ app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 app.post('/walletep',  async function(req,res){
 
     const msg = req.body;
-    console.log("message received: ", Date.now(), msg);
+    //console.log("message received: ", Date.now(), msg);
 
     if (msg.cmd == 'createUser') {
         Register(msg.id) //TODO:: Check result?
     }
     else if(msg.cmd == 'notified'){
-        OAuthn(msg.deviceToken, msg.payload)
+        OAuthn(msg)
     }
     else if (msg.cmd == 'getPendingRequest')
     {

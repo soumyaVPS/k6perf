@@ -1,4 +1,3 @@
-//Cmd to execute: k6 run  -e userid=test-login0.8211764547939031@example.com oaauth.js
 //const debug = require('debug')('oauth')
 import { check } from "k6";
 import http from "k6/http";
