@@ -31,9 +31,10 @@ app.post('/logger',  async function(req,res){
                 'notificationArrived':  msg.notificationArrived,
                 'dbResponded': msg.dbResponded,
                 'loginCompleted': msg.loginCompleted,
-                'Totalduration':  parseInt(msg.loginCompleted) - parseInt(msg.httpNotifiedAt),
-                'dbResponseTime' : parseInt(msg.dbResponded) - parseInt(msg.notificationArrived),
+                'Totalduration':  msg.loginCompleted - msg.httpNotifiedAt,
+                'dbResponseTime' : msg.dbResponded - msg.notificationArrived,
             }
+
         };
 
         dbprom = docClient.put(params).promise()

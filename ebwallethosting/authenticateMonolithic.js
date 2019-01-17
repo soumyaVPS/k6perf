@@ -1,6 +1,6 @@
 const Config = require('./config.js');
 const URL = require('url');
-const WalletUtils = require('./lib/WalletUtils');
+const WalletUtils = require('../lib/WalletUtils');
 const Storage = require('./walletdb')
 const CircularJSON = require('circular-json-es6')
 const Jsrsasign = require("jsrsasign");

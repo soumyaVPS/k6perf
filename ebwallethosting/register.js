@@ -46,4 +46,3 @@ module.exports = function  register(loginHint) {
                 return r.body
             })
 
-    }

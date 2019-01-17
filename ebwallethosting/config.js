@@ -1,7 +1,6 @@
 module.exports=
 { "relyingparty": "https://perf-tk-rp.herokuapp.com/login",
-    "login_hint":"soumya.aithal@trustedkey.com",
-    "walletServiceUrl": "https://perfwalletv1.stg.trustedkey.io",
+     "walletServiceUrl": "https://perfwalletv1.stg.trustedkey.io",
     //"submitloginuri": `/oauth/IDentify/submitLogin?query=queryParam&username=usernameParam`,
     "submitloginuri": "/oauth/IDentify/submitLogin",
     "waitloginuri": `/oauth/IDentify/waitLogin?guid=guidparam`,

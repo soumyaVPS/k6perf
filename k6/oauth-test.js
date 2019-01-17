@@ -5,7 +5,7 @@
     import { Trend, Rate, Counter, Gauge } from "k6/metrics";
 
 
-    const config = require('./config.js');
+    const config = require('./k6config.js');
 
     export let TrendRTTTK2 = new Trend("tk_oauth-authz RTT");
     export let RateContentOKTK2 = new Rate("tk-oauth-authz Content OK");
@@ -30,8 +30,8 @@
 
     function parseParam(query, qp)
     {
-        var vars = query.split('&');
-        for (var i = 0; i < vars.length; i++) {
+        let vars = query.split('&');
+        for (let i = 0; i < vars.length; i++) {
             var pair = vars[i].split('=');
             if (pair[0] == qp)
                 return pair[1]
@@ -42,13 +42,14 @@
     export default function (uriComponent) {
 
 
-        var vu_id = `${__VU}`
+        const vu_id = `${__VU}`
+        let username = envLoginPrefix + vu_id
 
-        ////console.log("****************************"+ env_login_prefix)
-        var username = envLoginPrefix + vu_id
-
-        //username = "tree123666"
-        let urlpath = "https://wallet-stg.trustedkey.com/oauth/authorize?client_id=56623880-b4a1-4085-bb3e-b32986503c67&redirect_uri=https%3A%2F%2Fperf-tk-rp.herokuapp.com%2Foauth%2Fcallback&scope=openid%20https%3A%2F%2Fauth.trustedkey.com%2Fuser_sign&response_type=code&state=login&login_hint="
+        let urlpath = config.walletServiceUrl + "/oauth/authorize?client_id=" +config.clientId+
+            "&redirect_uri=https%3A%2F%2Fperf-tk-rp.herokuapp.com%2Foauth%2Fcallback" +
+//            "&redirect_uri="+ encodeURI(config.walletServiceUrl+config.callbackRoute)+
+            "&scope=openid%20https%3A%2F%2Fauth.trustedkey.com%2Fuser_sign" +
+            "&response_type=code&state=login&login_hint="
         urlpath += username
         let res2 = http.get(urlpath,
             {
@@ -68,9 +69,11 @@
         //oauth redirects to login.html. Shows image and downloads scripts. the scripts invoke submitlogin and waitlogin
         //loginurl = config.walletServiceUrl + res2.headers["Location"]
 
-        var loginurl = res2.headers["Location"] //TODO::which urlpath to chose? http push has the complete url
+        let loginurl = res2.headers["Location"] //TODO::which urlpath to chose? http push has the complete url
+        if(loginurl[0] == '/'){
+            loginurl = config.walletServiceUrl + loginurl
+        }
 
-        //console.log("Calling All logging urls: \n", loginurl)
         let res3 = http.get(loginurl,
             {
                 tags: {name: "loginurl"},
@@ -148,5 +151,5 @@
                 }
 
             */
-
+        sleep(100)
     }

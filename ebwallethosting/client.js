@@ -1,5 +1,5 @@
 // Custom Trusted Key http client that signs requests
-const WalletUtils = require('./lib/WalletUtils')
+const WalletUtils = require('../lib/WalletUtils')
 const Utils = require('trustedkey-js/utils')
 const Request = require('supertest')
 const Config = require('./config')

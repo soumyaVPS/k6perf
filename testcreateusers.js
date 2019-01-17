@@ -18,10 +18,11 @@ async function main() {
 }
 //main()
 let recordTime = {}
-recordTime.notificationArrived = Date.now()
+recordTime.notificationArrived = Date.now() +150
 recordTime.dbResponded = Date.now()
 a = JSON.stringify(recordTime)
-//console.log(a ,a.dbResponded.toLocaleString())
+console.log(recordTime)
+console.log(a)
 console.log(new Date(parseInt("1547594545839")).toLocaleString())
 console.log(new Date(1547594618643).toLocaleString())
-
+console.log (recordTime.notificationArrived - recordTime.dbResponded)
